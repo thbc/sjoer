@@ -22,7 +22,7 @@ namespace Assets.InfoItems
         public InfoItem(DTO dto, DataType dataType, DisplayArea displayArea)
         {
             this.meta = new Meta(dto.Target, dataType, displayArea);
-            this.dto  = dto;
+            this.dto = dto;
         }
 
         public override bool Equals(System.Object i)
@@ -117,6 +117,15 @@ namespace Assets.InfoItems
             Retarget();
 
             Debug.Log($"{Key} = {this.meta.DesiredState}");
+
+            /*  // send MARKED object to other devices
+             if(gameObject?.tag == "MARKED")
+             {
+                 Debug.LogWarning("MARKED "+ gameObject.name);
+                 GameObject.Find("default").GetComponent<MeshRenderer>().material = Marker.Instance.GetAssignedMaterial();
+             } */
+
+
             // Get new shape
             Reshape();
             // Fill new shape if necessary
@@ -131,8 +140,9 @@ namespace Assets.InfoItems
             else HelperClasses.TargetNumberProvider.Instance.HandInTargetInt(this.meta.TargetNum);
         }
 
+
         // Update target in meta according to selected in scene or selected previously
-        protected void Retarget ()
+        protected void Retarget()
         {
             this.meta.DesiredState =
                 (this.dto.Target || (GetTargetHandler() && (GetTargetHandler().IsTarget))) ? ExpandState.Target
@@ -140,7 +150,28 @@ namespace Assets.InfoItems
                 : ExpandState.Collapsed;
 
             // Only update the target number if the target has changed. This is the responsibility of the horizon plane
-            if (TargetHasChanged() && DisplayArea == DisplayArea.HorizonPlane) UpdateTargetNum();
+            if (TargetHasChanged())
+            {
+                if (DisplayArea == DisplayArea.HorizonPlane)
+                {
+                    UpdateTargetNum();
+                    if (this.meta.DesiredState == ExpandState.Target)
+                    {
+                        if (Marker.Instance.allowMarking)
+                        {
+                            //  this.gameObject.tag = "MARKED";
+                            Marker.Instance.SendMarker(this.dto.Key);
+                        }
+                    }
+                    else if(this.meta.DesiredState == ExpandState.Collapsed && this.gameObject.tag == "MARKED")
+                    {
+                        Marker.Instance.UnmarkItem(this.gameObject);
+                    }
+
+                }
+
+
+            }
         }
 
         public TargettableInfoItem GetTargetHandler(bool forceUpdate = false)
@@ -157,8 +188,8 @@ namespace Assets.InfoItems
         public bool TargetHasChanged()
         {
             return (
-                this.meta.DesiredState == ExpandState.Target 
-                || this.meta.CurrentState == ExpandState.Target) 
+                this.meta.DesiredState == ExpandState.Target
+                || this.meta.CurrentState == ExpandState.Target)
                 && this.meta.DesiredState != this.meta.CurrentState;
         }
 

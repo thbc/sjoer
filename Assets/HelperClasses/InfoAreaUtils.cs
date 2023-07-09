@@ -157,12 +157,25 @@ namespace Assets.HelperClasses
 
             boxCollider.size = new Vector3(boxCollider.size.x, def ? 3 : boxCollider.size.y + (numInfo - 1) * boxCollider.size.y, boxCollider.size.z);
             boxCollider.center = new Vector3(boxCollider.center.x, def ? 1.5f : boxCollider.size.y / 2, boxCollider.center.z);
+       
+       if(!def)
+       {
+         GameObject defT = target.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject;
+         if(defT.tag == "MARKED")
+         defT.GetComponent<MeshRenderer>().material = Marker.Instance.GetAssignedMaterial();
+
+       }
         }
 
         public void ToggleHelperStick(GameObject g, bool enable)
         {
             GameObject helperStick = g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/StickConnection").gameObject;
             helperStick.SetActive(enable);
+
+          
+ 
+
+
         }
 
         public void ToggleAISPinOverflowVisible(GameObject g, ExpandState expandState)
@@ -178,6 +191,8 @@ namespace Assets.HelperClasses
 
             // Lastly enable/disable the target image
             g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/TopPinAnchor/TopPinAnchor2/CanvasTxt/Target").GetComponent<Image>().enabled = expandState == ExpandState.Target; ;
+       
+        
         }
 
         public void ToggleTargetActive(GameObject g, ExpandState expandState)

@@ -14,6 +14,7 @@ namespace Assets.DataManagement
         public int TargetNum { get; set; }
         public bool Valid { get; set; }
 
+
     }
 
     public class AISDTOs : DTO
@@ -41,6 +42,9 @@ namespace Assets.DataManagement
         public string Name { get; set; }
         public int IMO { get; set; }
         public string Country { get; set; }
+
+
+          public bool IsMarked { get; set; }
 
     }
 

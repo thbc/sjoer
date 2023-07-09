@@ -9,14 +9,17 @@ EditorBuildSettings:
     path: Assets/Scenes/Default-networking.unity
     guid: 9e12c67301f274e4189f384b11740149
   - enabled: 0
-    path: Assets/Scenes/Calibration.unity
-    guid: d4d30d0067607e643939b00faebd1a6f
-  - enabled: 0
-    path: Assets/Multiplayer/v4/PointerResultEx.unity
-    guid: 096ed32ac2d49894c91d9594cb5e4dd7
+    path: 
+    guid: 00000000000000000000000000000000
   - enabled: 1
     path: Assets/Scenes/Default-original.unity
     guid: 0edf0dba8defa464d84200325b87256c
+  - enabled: 0
+    path: Assets/Scenes/Calibration.unity
+    guid: d4d30d0067607e643939b00faebd1a6f
+  - enabled: 0
+    path: Assets/Multiplayer/230512/230512.unity
+    guid: c5627619966746a4bb1b3a5b5d673f76
   m_configObjects:
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 38c30238ae9806e4eab5e3f5a9c7a690, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 6b8259128faa40c4a877ea084109c17b, type: 2}
