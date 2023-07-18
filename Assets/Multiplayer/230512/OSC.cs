@@ -197,6 +197,7 @@ public class UDPPacketIO
         Receiver = null;
         socketsOpen = false;
 
+
     }
 
     public void OnDisable()
@@ -403,13 +404,7 @@ public delegate void OscMessageHandler(OscMessage oscM);
 /// </summary>
 public class OSC : MonoBehaviour
 {
-    public string m_Player1_outIP = "127.0.0.1";
-
-    public string m_Player2_outIP = "127.0.0.1";
-
-    private int inPort = 6969;
-    private string outIP = "127.0.0.1";
-    private int outPort = 6161;
+   
 
     private UDPPacketIO OscPacketIO;
     Thread ReadThread;
@@ -442,33 +437,30 @@ public class OSC : MonoBehaviour
 #endif
 
     #region Custom Modifications
-    [Serializable]
-    public enum PlayerIndex
+
+
+    public ConnectionController connectionController;
+    public bool isInitialized;  // set when oscReceiver gets first ping
+   
+
+
+    public int inPort;// = 6969;
+    public string outIP;// = "127.0.0.1";
+    public int outPort;// = 6161;
+
+   public void SetupOSC(string _outIP, int _outPort, int _inPort)
+{
+
+        outIP = _outIP;//"192.168.1.104";// _outIP;
+//#if UNITY_EDITOR_WIN
+//        outIP = "192.168.1.124";
+//#endif
+        outPort = _outPort;
+    inPort = _inPort;
+
+          // the try / catch block is not neccessary here, since it s most likely never going to fail setting up the osc object (->is independent from establishing a connection / "handshake")
+    try
     {
-        Player_1, Player_2, TestMode
-    }
-    public PlayerIndex playerType = PlayerIndex.Player_1;
-    void Awake()
-    {
-        //print("Opening OSC listener on port " + inPort);
-        if (playerType == PlayerIndex.Player_1)
-        {
-            outIP = m_Player1_outIP;
-            outPort = 6969;
-            inPort = 7070;
-        }
-        else if (playerType == PlayerIndex.Player_2)
-        {
-            outIP = m_Player2_outIP;
-            outPort = 7070;
-            inPort = 6969;
-        }
-        else if (playerType == PlayerIndex.TestMode)
-        {
-            outIP = "127.0.0.1";
-            inPort = 6969;
-            outPort = 6969;
-        }
         OscPacketIO = new UDPPacketIO(outIP, outPort, inPort);
         AddressTable = new Hashtable();
 
@@ -476,19 +468,28 @@ public class OSC : MonoBehaviour
 
         buffer = new byte[1000];
 
-
         ReadThread = new Thread(Read);
         ReaderRunning = true;
         ReadThread.IsBackground = true;
         ReadThread.Start();
-        #endregion
 
 #if UNITY_EDITOR
         //UnityEditor.EditorApplication.playmodeStateChanged = HandleOnPlayModeChanged;
         UnityEditor.EditorApplication.playModeStateChanged += HandleOnPlayModeChanged;  //FIX FOR UNITY POST 2017
 #endif
 
+        //isInitialized = true;
+            Debug.Log("Initialized OSC for : " + " " + outIP + " " + outPort + " " + inPort);
+
+        }
+        catch (Exception e)
+    {
+        Debug.LogWarning("Failed to set up OSC: " + e.Message + "\n" + "for : " + outIP + outPort + inPort);
+        //isInitialized = false;
     }
+}
+
+    #endregion
 
     void OnDestroy()
     {
@@ -538,7 +539,7 @@ public class OSC : MonoBehaviour
     {
 
 
-        if (messagesReceived.Count > 0)
+        if (messagesReceived?.Count > 0)        // added "?" for ignoring null reference calls before OSC is initalized
         {
             //Debug.Log("received " + messagesReceived.Count + " messages");
             lock (ReadThreadLock)
@@ -600,6 +601,8 @@ public class OSC : MonoBehaviour
             print("Closed OSC listener");
         }
 
+       
+
     }
 
 
@@ -656,12 +659,23 @@ public class OSC : MonoBehaviour
     /// Send an individual OSC message.  Internally takes the OscMessage object and 
     /// serializes it into a byte[] suitable for sending to the PacketIO.
     /// </summary>
-    /// <param name="oscMessage">The OSC Message to send.</param>   
+    /// <param name="oscMessage">The OSC Message to send.</param>  
+    public void SendPing(OscMessage oscMessage)
+    {
+            byte[] packet = new byte[1000];
+            int length = OSC.OscMessageToPacket(oscMessage, packet, 1000);
+            OscPacketIO.SendPacket(packet, length);      
+    }
     public void Send(OscMessage oscMessage)
     {
-        byte[] packet = new byte[1000];
-        int length = OSC.OscMessageToPacket(oscMessage, packet, 1000);
-        OscPacketIO.SendPacket(packet, length);
+        if (isInitialized) // added to avoid null reference when osc is not initialized yet
+        {
+            byte[] packet = new byte[1000];
+            int length = OSC.OscMessageToPacket(oscMessage, packet, 1000);
+            OscPacketIO.SendPacket(packet, length);
+        }
+        else
+            Debug.LogWarning("Not sending. IsInitialized is " + isInitialized);
     }
 
     /// <summary>
@@ -671,9 +685,14 @@ public class OSC : MonoBehaviour
     /// <param name="oms">The OSC Message to send.</param>   
     public void Send(ArrayList oms)
     {
-        byte[] packet = new byte[1000];
-        int length = OSC.OscMessagesToPacket(oms, packet, 1000);
-        OscPacketIO.SendPacket(packet, length);
+        if (isInitialized) // added to avoid null reference when osc is not initialized yet
+        {
+            byte[] packet = new byte[1000];
+            int length = OSC.OscMessagesToPacket(oms, packet, 1000);
+            OscPacketIO.SendPacket(packet, length);
+        }
+        else
+            Debug.LogWarning("Not sending. IsInitialized is " + isInitialized);
     }
 
     /// <summary>

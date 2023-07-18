@@ -193,7 +193,7 @@ namespace Assets.DataManagement
                 tcpClient.Close();
             } catch (SocketException e)
             {
-                Debug.Log("Socket Exception: " + e);
+                Debug.Log("Trying to listen for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"] + " on port: "+ int.Parse(Config.Instance.conf.PhoneGPS["port"])+ "...but: " + "Socket Exception: " + e);
             }
         }
 

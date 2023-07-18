@@ -157,15 +157,15 @@ namespace Assets.InfoItems
                     UpdateTargetNum();
                     if (this.meta.DesiredState == ExpandState.Target)
                     {
-                        if (Marker.Instance.allowMarking)
+                        if (MarkerMode.Instance.allowMarking)
                         {
                             //  this.gameObject.tag = "MARKED";
-                            Marker.Instance.SendMarker(this.dto.Key);
+                            MarkerMode.Instance.SendMarker(this.dto.Key);
                         }
                     }
                     else if(this.meta.DesiredState == ExpandState.Collapsed && this.gameObject.tag == "MARKED")
                     {
-                        Marker.Instance.UnmarkItem(this.gameObject);
+                        MarkerMode.Instance.UnmarkItem(this.gameObject);
                     }
 
                 }

@@ -162,7 +162,7 @@ namespace Assets.HelperClasses
        {
          GameObject defT = target.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject;
          if(defT.tag == "MARKED")
-         defT.GetComponent<MeshRenderer>().material = Marker.Instance.GetAssignedMaterial();
+         defT.GetComponent<MeshRenderer>().material = MarkerMode.Instance.GetAssignedMaterial();
 
        }
         }
