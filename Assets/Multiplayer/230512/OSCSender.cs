@@ -30,67 +30,18 @@ public class OSCSender : MonoBehaviour
         sentPong = true;
     }
 
-    public void SendCursor(Vector3 pointerLocalPosition, Quaternion pointerLocalRotation)
+    public void SendCursorPos(float x,float y, float z)
     {
-       
-    }
-
-    public void SendCursorPos(Vector3 _pos)
-    {
-        //float x = _pos.x;
-        //float y = _pos.y;
-        //float z = _pos.z;
-
-        //OscMessage message = new OscMessage();
-        //message.address = "/pos";
-        //message.values.Add(x);
-        //message.values.Add(y);
-        //message.values.Add(z);
-        //osc.Send(message);
         OscMessage msg = new OscMessage();
-        msg.address = "/pos";
-        msg.values.Add(_pos.x);
-        msg.values.Add(_pos.y);
-        msg.values.Add(_pos.z);
-        
+        msg.address = "/cursorPos";
+        msg.values.Add(x);
+        msg.values.Add(y);
+        msg.values.Add(z);
         osc.Send(msg);
-
-        Debug.Log("sent " + msg.ToString());
+        Debug.Log("sent: " + msg.ToString());
     }
-    public void SendCursorRot(Quaternion _rot)
-    {
-        OscMessage msg = new OscMessage();
-        msg.address = "/rot";
-        msg.values.Add(_rot.x);
-        msg.values.Add(_rot.y);
-        msg.values.Add(_rot.z);
-        msg.values.Add(_rot.w);
-       
-        osc.Send(msg);
-
-        Debug.Log("sent " + msg.ToString());
-    }
-    public void SendCursorAngles(float _az, float _elev)
-    {
-        //float x = _rot.x;
-        //float y = _rot.y;
-        //float z = _rot.z;
-        //float w = _rot.w;
-        //OscMessage message = new OscMessage();
-        //message.address = "/rot";
-        //message.values.Add(x);
-        //message.values.Add(y);
-        //message.values.Add(z);
-        //message.values.Add(w);
-        //osc.Send(message);
-        OscMessage msg = new OscMessage();
-        msg.address = "/rot";
-        msg.values.Add(_az);
-        msg.values.Add(_elev);
-        
-
-        Debug.Log("sent " + msg.ToString());
-    }
+  
+  
     public void SendMarked(string _vesselName)
     {
         OscMessage message = new OscMessage();

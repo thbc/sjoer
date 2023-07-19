@@ -2,6 +2,8 @@
 using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
+using Assets.Positional;
+
 public class OSCReceiver : MonoBehaviour
 {
     public OSC osc;
@@ -19,8 +21,7 @@ public class OSCReceiver : MonoBehaviour
         osc.SetAddressHandler("/ping", OnReceivePing);
         osc.SetAddressHandler("/pong", OnReceivePong);
 
-        osc.SetAddressHandler("/pos", OnReceivePos);
-        osc.SetAddressHandler("/rot", OnReceiveRot);
+        osc.SetAddressHandler("/cursorPos", OnReceiveCursorPos); 
         osc.SetAddressHandler("/marked", OnReceiveMark);
     }
 
@@ -57,65 +58,24 @@ public class OSCReceiver : MonoBehaviour
         connectionController.OnSuccessfullyConnected();
     }
 
-    public Transform originTransform;
-    void OnReceivePos(OscMessage msg)
-    {
-        
-        //float x = message.GetFloat(0);
-        //float y = message.GetFloat(1);
-        //float z = message.GetFloat(2);
 
-        //Debug.Log("received: " + x + y + z);
+    public Transform playerTransform;
+
+    public Player aligner;
+   
+    public Transform playerCoordinateTransform;
+    void OnReceiveCursorPos(OscMessage msg)
+    {
+        if (CoPlayerCursorHighlight != null)
+        {
+            float x = msg.GetFloat(0);
+            float y = msg.GetFloat(1);
+            float z = msg.GetFloat(2);
+            // Return the position relative to the player's position
+            CoPlayerCursorHighlight.transform.position = playerCoordinateTransform.transform.position + new Vector3(x, y, z);
+        }
+    }
     
-        if (CoPlayerCursorHighlight != null)
-        {
-            Vector3 receivedPosition = new Vector3(msg.GetFloat(0), msg.GetFloat(1), msg.GetFloat(2));
-
-
-            // Transform the received position and rotation from local coordinates to world coordinates
-            Vector3 worldPosition = originTransform.TransformPoint(receivedPosition);
-
-            // CoPlayerCursorHighlight.transform.position = new Vector3(x, y, z);
-            CoPlayerCursorHighlight.transform.position = worldPosition;
-        }
-    }
-    void OnReceiveRot(OscMessage msg)
-    {
-        //float x = message.GetFloat(0);
-        //float y = message.GetFloat(1);
-        //float z = message.GetFloat(2);
-        //float w = message.GetFloat(3);
-
-        //Debug.Log("received: " + x + y + z + w);
-
-        if (CoPlayerCursorHighlight != null)
-        {
-            //    //CoPlayerCursorHighlight.transform.rotation = new Quaternion(x, y, z, w);
-
-            //  Quaternion receivedRotation = new Quaternion(msg.GetFloat(0), msg.GetFloat(1), msg.GetFloat(2), msg.GetFloat(3));
-            //   Quaternion worldRotation = Quaternion.LookRotation(originTransform.TransformDirection(receivedRotation * Vector3.forward), originTransform.TransformDirection(receivedRotation * Vector3.up)); 
-        
-            
-            //Quaternion receivedRotation = new Quaternion(msg.GetFloat(0), msg.GetFloat(1), msg.GetFloat(2), msg.GetFloat(3));
-            //Quaternion worldRotation = Quaternion.LookRotation(originTransform.TransformDirection(receivedRotation * Vector3.forward), originTransform.TransformDirection(receivedRotation * Vector3.up)); 
-            //CoPlayerCursorHighlight.transform.rotation = worldRotation;
-
-            float azimuth = msg.GetFloat(0);
-            float elevation = msg.GetFloat(1);
-
-            Vector3 originToPoint;
-            originToPoint.x = Mathf.Sin(elevation) * Mathf.Sin(azimuth);
-            originToPoint.y = Mathf.Cos(elevation);
-            originToPoint.z = Mathf.Sin(elevation) * Mathf.Cos(azimuth);
-
-            CoPlayerCursorHighlight.transform.position = Vector3.zero + originToPoint * 5.0f; // (5.0f is distance) is how far you want the pointer to be from the origin
-
-
-        }
-    }
-
-  
-
     //TODO: create list of marked strings and check if "s" already exists
     void OnReceiveMark(OscMessage message)
     {

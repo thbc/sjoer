@@ -6,7 +6,9 @@ using UnityEngine;
 using System.Linq;
 using Microsoft.MixedReality.Toolkit.Utilities;
 using Microsoft.MixedReality.Toolkit.Physics;
-using Unity.Mathematics;
+
+using Assets.Positional;
+
 
 public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
 {
@@ -42,8 +44,12 @@ public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
     Vector3 previousPosition;
     Quaternion previousRotation;
 
-    public Transform originTransform;
+   // public Transform playerTransform;
 
+    public Player player;
+
+
+    public Transform playerCoordinatesTransform;
 
     private void FixedUpdate()
     {
@@ -51,55 +57,38 @@ public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
         {
                
             if (sender != null)
-            {
-                RayStep rayStep = p.Rays[0];
-                Vector3 rayOrigin = rayStep.Origin;
-                Vector3 rayDirection = rayStep.Direction;
-                Vector3 positionUnitsAway = rayOrigin + rayDirection * 5.0f;
-
-                //if (p.Position != previousPosition && p.Position != Vector3.zero) // Compare with the previous position -- but only send if values are not 0
-                //    {
-                    //RayStep rayStep = p.Rays[0];
-                    //Vector3 rayOrigin = rayStep.Origin;
-                    //Vector3 rayDirection = rayStep.Direction;
-                    //Vector3 positionUnitsAway = rayOrigin + rayDirection * 5.0f;
-                    //sender.SendCursor(positionUnitsAway);
-
-                    ////sender.SendCursor(p.Position);
-                    //previousPosition = p.Position; // Update the previous position
-                                   
-                        Vector3 pointerPositionRelativeToOrigin = originTransform.InverseTransformPoint(positionUnitsAway);
-                        //  Debug.LogWarning("POS " + pointerPositionRelativeToOrigin); 
-                        sender.SendCursorPos(pointerPositionRelativeToOrigin);
-                        previousPosition = pointerPositionRelativeToOrigin;
+            {                       
+                    RayStep rayStep = p.Rays[0];
+                    Vector3 rayOrigin = rayStep.Origin;
+                    Vector3 rayDirection = rayStep.Direction;
+                    Vector3 positionUnitsAway = rayOrigin + rayDirection * 5.0f;
 
 
-                Vector3 originToPoint = positionUnitsAway - Vector3.zero; // this is the position of the pointer in world space
-                originToPoint.Normalize(); // make it a unit vector
+                    Vector3 obj = positionUnitsAway;
+                    float distance = Vector3.Distance(obj, playerCoordinatesTransform.transform.position);
 
-                float azimuth = Mathf.Atan2(originToPoint.x, originToPoint.z);
-                float elevation = Mathf.Asin(originToPoint.y);
+                    // Get a vector from player to object
+                    Vector3 dir = (obj - playerCoordinatesTransform.transform.position).normalized;
 
-                sender.SendCursorAngles(azimuth, elevation);
+                    // Calculate azimuth and elevation
+                    float azimuth = (Mathf.Atan2(dir.x, dir.z) * Mathf.Rad2Deg);
+                    if (azimuth < 0) azimuth += 360; // Ensure azimuth is between 0 and 360
 
-                //}
-                //if (p.Rotation != previousRotation)
-                //{
-                //sender.SendCursor(p.Rotation);
-                //previousRotation = p.Rotation;
+                    float elevation = Mathf.Asin(dir.y) * Mathf.Rad2Deg;
 
+                    // Convert angles from degrees to radians
+                    float azimuthRad = azimuth * Mathf.Deg2Rad;
+                    float elevationRad = elevation * Mathf.Deg2Rad;
 
-                //Quaternion pointerRotationRelativeToOrigin = Quaternion.LookRotation(originTransform.InverseTransformDirection(p.Rotation * Vector3.forward), originTransform.InverseTransformDirection(p.Rotation * Vector3.up));
+                    // Convert spherical coordinates to Cartesian coordinates
+                    float x = distance * Mathf.Cos(elevationRad) * Mathf.Sin(azimuthRad);
+                    float y = distance * Mathf.Sin(elevationRad);
+                    float z = distance * Mathf.Cos(elevationRad) * Mathf.Cos(azimuthRad);
 
-                //   // Quaternion pointerRotation = Quaternion.LookRotation(rayDirection);
-
-                //    //Quaternion pointerRotationRelativeToOrigin = Quaternion.LookRotation(originTransform.InverseTransformDirection(pointerRotation * Vector3.forward), originTransform.InverseTransformDirection(pointerRotation * Vector3.up));
-                //        // Debug.LogWarning("ROT " + pointerRotationRelativeToOrigin);
-                //        sender.SendCursorRot(pointerRotationRelativeToOrigin); 
-                //        previousRotation =pointerRotationRelativeToOrigin;
-                    //}
-                }
-                else
+                    sender.SendCursorPos(x,y, z);
+                
+            }
+            else
                 {
                     Debug.LogWarning("sender not defined");
                 }            
