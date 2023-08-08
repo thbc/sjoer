@@ -4,12 +4,8 @@ using UnityEngine;
 using Assets.Positional;
 public class CoordinatesRenderer : MonoBehaviour
 {
-    public bool trueNorthCoordinates;
-    public bool usePlayerMainCam;
-    public Player player;
-    float trueNC_initialY;
-    public Transform playerCam;
-
+    private PlayerCoordinates playerCord;
+    [Tooltip("The transform position to be used for rendering the coordinate system. Assigned Transform will be overriden by playerCoordinate system if active on this object.")]
     public Transform coordinate;  // Assign your playspace transform here
     public Material lineMaterial;
     private LineRenderer lineRendererX;
@@ -28,39 +24,64 @@ public class CoordinatesRenderer : MonoBehaviour
 
     public float lineWidth = 0.1f;
 
-    void Start()
+    bool isInitialized;
+
+    // --- ! keep this disabled in the scene and enable it from another script
+
+    private void OnEnable()
     {
-            if (trueNorthCoordinates)
+        if (!isInitialized)
+        {
+            if (playerCord == null)
+                playerCord = GetComponent<PlayerCoordinates>();
+
+            if (playerCord != null)
             {
-                if (usePlayerMainCam)
-                    playerCam = player.mainCamera.transform;
+                if (playerCord.enabled)
+                {
+                    coordinate = this.transform;
+                    coordinate.position = playerCord.playerCam.position;
+                    coordinate.rotation = playerCord.player.Unity2TrueNorth;
+                }// else: playerCoordinates not enabled
+            } // else: is not playerCoordinates
 
-                coordinate = this.transform;
-                coordinate.position = playerCam.position;
-                coordinate.rotation = player.Unity2TrueNorth;
-                trueNC_initialY = coordinate.position.y;
-            }
+            // Create LineRenderers
+            lineRendererX = CreateLineRenderer(colorX);
+            lineRendererY = CreateLineRenderer(colorY);
+            lineRendererZ = CreateLineRenderer(colorZ);
+
+            // Create labels
+            labelX = CreateLabel(coordinateName + ":X", colorX);
+            labelY = CreateLabel(coordinateName + ":Y", colorY);
+            labelZ = CreateLabel(coordinateName + ":Z", colorZ);
+
+            isInitialized = true;
+        }
+        else if (isInitialized)
+        {
+            lineRendererX.gameObject.SetActive(true);
+            lineRendererY.gameObject.SetActive(true);
+            lineRendererZ.gameObject.SetActive(true);
+            labelX.gameObject.SetActive(true);
+            labelY.gameObject.SetActive(true);
+            labelZ.gameObject.SetActive(true);
+        }
+
         
-        // Create LineRenderers
-        lineRendererX = CreateLineRenderer(colorX);
-        lineRendererY = CreateLineRenderer(colorY);
-        lineRendererZ = CreateLineRenderer(colorZ);
-
-        // Create labels
-        labelX = CreateLabel(coordinateName+":X", colorX);
-        labelY = CreateLabel(coordinateName + ":Y", colorY);
-        labelZ = CreateLabel(coordinateName + ":Z", colorZ);
-
-        
+    }
+    private void OnDisable()
+    {
+        lineRendererX.gameObject.SetActive(false);
+        lineRendererY.gameObject.SetActive(false);
+        lineRendererZ.gameObject.SetActive(false);
+        labelX.gameObject.SetActive(false);
+        labelY.gameObject.SetActive(false);
+        labelZ.gameObject.SetActive(false);
     }
 
     void Update()
     {
-        if (trueNorthCoordinates)
-        {
-            coordinate.position = new Vector3(playerCam.position.x, trueNC_initialY, playerCam.position.z);
-            coordinate.rotation = player.Unity2TrueNorth;
-        }
+        
 
         // Calculate rays for each axis
         Vector3 origin = coordinate.position;
@@ -74,9 +95,6 @@ public class CoordinatesRenderer : MonoBehaviour
         SetLabelPosition(labelX, origin + coordinate.right * rayLength);
         SetLabelPosition(labelY, origin + coordinate.up * rayLength);
         SetLabelPosition(labelZ, origin + coordinate.forward * rayLength);
-
-       
-
 
     }
 
