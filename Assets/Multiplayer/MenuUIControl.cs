@@ -23,6 +23,8 @@ public class MenuUIControl : MonoBehaviour
     public GameObject loadedIPConfig;
     public TextMesh loadedIPConfigBtnLabel;
 
+    public TextMesh loadedGPSIPConfigBtnLabel;
+
     bool hasLoadedConfig;
 
     private void Start()
@@ -33,6 +35,8 @@ public class MenuUIControl : MonoBehaviour
         if(connectionController.playerConfig!= null)
         {
             loadedIPConfigBtnLabel.text = connectionController.playerConfig.partnerDeviceIP;
+            loadedGPSIPConfigBtnLabel.text = connectionController.playerConfig.gpsIP;
+
             hasLoadedConfig = true;
         }
         else
@@ -137,6 +141,50 @@ public class MenuUIControl : MonoBehaviour
 
         }
     }
+    //GPS IP settings
+    string _tempGPSIP;
+    public void EnterGPSIPCharacter(string val)
+    {
+        if (!string.IsNullOrWhiteSpace(_tempGPSIP))
+        {
+            _tempGPSIP = _tempGPSIP + val;
+            ipLabel.text = _tempGPSIP;
+        }
+        else
+            _tempGPSIP = val;
+    }
+    public void RemoveGPSIPCharacter()
+    {
+        _tempGPSIP = _tempGPSIP.Remove(_tempGPSIP.Length - 1);
+        ipLabel.text = _tempGPSIP;
+
+    }
+    public void ResetGPSIPCharacters()
+    {
+        _tempGPSIP = null;
+        ipLabel.text = "";
+    }
+    public void ConnectLoadedGPSConfiguration()
+    {
+        _tempGPSIP = PlayerPrefs.GetString("GPSIP", "");
+        connectionController.playerConfig.gpsIP = _tempGPSIP;
+        loadedGPSIPConfigBtnLabel.text = _tempGPSIP;
+    }
+    public void ConnectGPS()
+    {
+        if (!string.IsNullOrWhiteSpace(_tempGPSIP) && IsValidIP(_tempGPSIP))
+        {
+            connectionController.playerConfig.gpsIP = _tempGPSIP;
+            PlayerPrefs.SetString("GPSIP", _tempGPSIP);
+
+            //ToggleConnectionSettingsMenu();
+            //connectionController.TryConnect();
+
+            //call here the GPS initialization
+
+        }
+    }
+    //end GPS
 
     public void SetMarkMode(TextMesh buttonLabel)
     {

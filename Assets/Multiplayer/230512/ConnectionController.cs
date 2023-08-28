@@ -5,7 +5,6 @@ using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
-using static ConnectionController.PlayerConfig;
 
 public class ConnectionController : MonoBehaviour
 {
@@ -18,7 +17,25 @@ public class ConnectionController : MonoBehaviour
 
     public CursorMultiplayer cursorMP;
 
+    public static ConnectionController Instance { get; private set; }
 
+    private void Awake()
+    {
+        // 2. Logic in Awake() to handle multiple instances
+        if (Instance == null)
+        {
+            Instance = this;
+            DontDestroyOnLoad(gameObject);
+        }
+        else if (Instance != this)
+        {
+            Destroy(gameObject);
+            return;
+        }
+
+    }
+
+  
     public static bool IsValidIP(string ipString)
     {
         if (String.IsNullOrWhiteSpace(ipString))
@@ -55,6 +72,8 @@ public class ConnectionController : MonoBehaviour
     [System.Serializable]
     public class PlayerConfig
     {
+        public string gpsIP;
+        public int gpsPort = 6000;
         public string partnerDeviceIP;
         public int inPort;
         public int outPort;
@@ -106,6 +125,8 @@ public class ConnectionController : MonoBehaviour
     {
         PlayerConfig loadedPlayerConfig = new PlayerConfig();
         loadedPlayerConfig.partnerDeviceIP = PlayerPrefs.GetString("PartnerDeviceIP", "");
+        loadedPlayerConfig.gpsIP = PlayerPrefs.GetString("GPSIP", "");
+
         //string _storedPlayerSel = PlayerPrefs.GetString("PlayerSelection", "");
         //if (_storedPlayerSel == "Player_1")
         //    loadedPlayerConfig.playerSelection = PlayerSelection.Player_1;
@@ -118,6 +139,7 @@ public class ConnectionController : MonoBehaviour
             return null;
     }
 
+
     public void StorePlayerConfig(PlayerConfig _playerConfig2Store)
     {
         //if (_playerConfig2Store.playerSelection != PlayerSelection.TestMode)
@@ -126,13 +148,17 @@ public class ConnectionController : MonoBehaviour
         //        PlayerPrefs.SetString("PlayerSelection", "Player_1");
         //    if (_playerConfig2Store.playerSelection == PlayerSelection.Player_2)
         //        PlayerPrefs.SetString("PlayerSelection", "Player_2");
+
         if (_playerConfig2Store.partnerDeviceIP != "127.0.0.1")
         {
             PlayerPrefs.SetString("PartnerDeviceIP", _playerConfig2Store.partnerDeviceIP);
-            PlayerPrefs.Save();
-        }
-        else Debug.LogWarning("Did not store configuration, since partnerIP was localhost...");
-       // }
+              PlayerPrefs.Save();
+  }
+        else
+        { Debug.LogWarning("Did not store Partner device ip configuration, since partnerIP was localhost..."); }
+        
+
+        // }
     }
 
 
@@ -141,7 +167,10 @@ public class ConnectionController : MonoBehaviour
         cursorMP.enabled = false;
         //DisplayConnectionSettings(false);
 
-       
+        playerConfig.gpsIP = PlayerPrefs.GetString("GPSIP", "");
+        Debug.LogWarning(playerConfig.gpsIP);
+
+
 
 
     }

@@ -35,7 +35,7 @@
     "HorizonPlaneRadius": 5
   },
   "PhoneGPS": {
-    "IP": "192.168.43.1",
+    "IP": "192.168.231.90",
     "port":  "6000"
   }
 }

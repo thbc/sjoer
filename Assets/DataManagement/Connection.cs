@@ -160,7 +160,7 @@ namespace Assets.DataManagement
         {
             try
             {
-                tcpClient = new TcpClient(Config.Instance.conf.PhoneGPS["IP"], int.Parse(Config.Instance.conf.PhoneGPS["port"]));
+                tcpClient = new TcpClient(ConnectionController.Instance.playerConfig.gpsIP, ConnectionController.Instance.playerConfig.gpsPort); //new TcpClient(Config.Instance.conf.PhoneGPS["IP"], int.Parse(Config.Instance.conf.PhoneGPS["port"]));
 
                 Byte[] bytes = new Byte[1024];
                 while (running)
@@ -193,7 +193,7 @@ namespace Assets.DataManagement
                 tcpClient.Close();
             } catch (SocketException e)
             {
-                Debug.Log("Trying to listen for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"] + " on port: "+ int.Parse(Config.Instance.conf.PhoneGPS["port"])+ "...but: " + "Socket Exception: " + e);
+                Debug.Log("Trying to listen for GPS data via TCP from: " + ConnectionController.Instance.playerConfig.gpsIP + " on port: "+ ConnectionController.Instance.playerConfig.gpsPort + "...but: " + "Socket Exception: " + e);
             }
         }
 
