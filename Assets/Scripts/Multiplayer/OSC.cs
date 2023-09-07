@@ -404,11 +404,14 @@ public delegate void OscMessageHandler(OscMessage oscM);
 /// </summary>
 public class OSC : MonoBehaviour
 {
-   
+
 
     private UDPPacketIO OscPacketIO;
     Thread ReadThread;
     private bool ReaderRunning;
+    public bool isReaderRunning {
+        get { return ReaderRunning; }
+    }
     private OscMessageHandler AllMessageHandler;
 
     Hashtable AddressTable;
@@ -441,53 +444,53 @@ public class OSC : MonoBehaviour
 
     public ConnectionController connectionController;
     public bool isInitialized;  // set when oscReceiver gets first ping
-   
+
 
 
     public int inPort;// = 6969;
     public string outIP;// = "127.0.0.1";
     public int outPort;// = 6161;
 
-   public void SetupOSC(string _outIP, int _outPort, int _inPort)
-{
+    public void SetupOSC(string _outIP, int _outPort, int _inPort)
+    {
 
         outIP = _outIP;//"192.168.1.104";// _outIP;
-//#if UNITY_EDITOR_WIN
-//        outIP = "192.168.1.124";
-//#endif
+                       //#if UNITY_EDITOR_WIN
+                       //        outIP = "192.168.1.124";
+                       //#endif
         outPort = _outPort;
-    inPort = _inPort;
+        inPort = _inPort;
 
-          // the try / catch block is not neccessary here, since it s most likely never going to fail setting up the osc object (->is independent from establishing a connection / "handshake")
-    try
-    {
-        OscPacketIO = new UDPPacketIO(outIP, outPort, inPort);
-        AddressTable = new Hashtable();
+        // the try / catch block is not neccessary here, since it s most likely never going to fail setting up the osc object (->is independent from establishing a connection / "handshake")
+        try
+        {
+            OscPacketIO = new UDPPacketIO(outIP, outPort, inPort);
+            AddressTable = new Hashtable();
 
-        messagesReceived = new ArrayList();
+            messagesReceived = new ArrayList();
 
-        buffer = new byte[1000];
+            buffer = new byte[1000];
 
-        ReadThread = new Thread(Read);
-        ReaderRunning = true;
-        ReadThread.IsBackground = true;
-        ReadThread.Start();
+            ReadThread = new Thread(Read);
+            ReaderRunning = true;
+            ReadThread.IsBackground = true;
+            ReadThread.Start();
 
 #if UNITY_EDITOR
-        //UnityEditor.EditorApplication.playmodeStateChanged = HandleOnPlayModeChanged;
-        UnityEditor.EditorApplication.playModeStateChanged += HandleOnPlayModeChanged;  //FIX FOR UNITY POST 2017
+            //UnityEditor.EditorApplication.playmodeStateChanged = HandleOnPlayModeChanged;
+            UnityEditor.EditorApplication.playModeStateChanged += HandleOnPlayModeChanged;  //FIX FOR UNITY POST 2017
 #endif
 
-        //isInitialized = true;
+            //isInitialized = true;
             Debug.Log("Initialized OSC for : " + " " + outIP + " " + outPort + " " + inPort);
 
         }
         catch (Exception e)
-    {
-        Debug.LogWarning("Failed to set up OSC: " + e.Message + "\n" + "for : " + outIP + outPort + inPort);
-        //isInitialized = false;
+        {
+            Debug.LogWarning("Failed to set up OSC: " + e.Message + "\n" + "for : " + outIP + outPort + inPort);
+            //isInitialized = false;
+        }
     }
-}
 
     #endregion
 
@@ -601,7 +604,7 @@ public class OSC : MonoBehaviour
             print("Closed OSC listener");
         }
 
-       
+
 
     }
 
@@ -662,9 +665,9 @@ public class OSC : MonoBehaviour
     /// <param name="oscMessage">The OSC Message to send.</param>  
     public void SendPing(OscMessage oscMessage)
     {
-            byte[] packet = new byte[1000];
-            int length = OSC.OscMessageToPacket(oscMessage, packet, 1000);
-            OscPacketIO.SendPacket(packet, length);      
+        byte[] packet = new byte[1000];
+        int length = OSC.OscMessageToPacket(oscMessage, packet, 1000);
+        OscPacketIO.SendPacket(packet, length);
     }
     public void Send(OscMessage oscMessage)
     {

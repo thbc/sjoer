@@ -9,6 +9,7 @@ namespace Assets.Positional
 {
     public class Player : MonoSingleton<Player>
     {
+        public bool debugVesselInfoInEditor = true;
         public Camera mainCamera;
 
         // Difference between vessel bearing (true north) and Hololens bearing (unity coordinates)
@@ -23,12 +24,44 @@ namespace Assets.Positional
 
         private async void updateGPS()
         {
-            lastGPSUpdate = (AISDTO) await gpsRetriever.fetch();
+            lastGPSUpdate = (AISDTO)await gpsRetriever.fetch();
+
+           Debug.Log("Lat: " + lastGPSUpdate.Latitude +"Lon: " + lastGPSUpdate.Longitude +"Heading: " + lastGPSUpdate.Heading +"SOG: " + lastGPSUpdate.SOG);
+            if (lastGPSUpdate != null && lastGPSUpdate.Valid)
+            {
+                if (DebugOnHead.Instance.gameObject.activeInHierarchy)
+                {
+                    DebugOnHead.Instance.DebugTextOnHead_2("updateGPS: " +
+                "Lat: " + lastGPSUpdate.Latitude +
+                "Lon: " + lastGPSUpdate.Longitude +
+                "Heading: " + lastGPSUpdate.Heading +
+                "SOG: " + lastGPSUpdate.SOG);
+                }
+            }
+            else
+            {
+                if (DebugOnHead.Instance.gameObject.activeInHierarchy)
+                {
+                    DebugOnHead.Instance.DebugTextOnHead_2("GPS data invalid or null: " +
+                    "Lat: " + lastGPSUpdate.Latitude +
+                    "Lon: " + lastGPSUpdate.Longitude +
+                    "Heading: " + lastGPSUpdate.Heading +
+                    "SOG: " + lastGPSUpdate.SOG);
+                }
+            }
+
             unitytoTrueNorth();
-            Debug.Log("Heading: " + lastGPSUpdate.Heading);
-            Debug.Log("SOG: " + lastGPSUpdate.SOG);
-            Debug.Log("Lat: " + lastGPSUpdate.Latitude);
-            Debug.Log("Lon: " + lastGPSUpdate.Longitude);
+#if UNITY_EDITOR
+            //this was added to keep the console clean.
+            if (this.debugVesselInfoInEditor)
+            {
+                Debug.Log("Heading: " + lastGPSUpdate.Heading);
+                Debug.Log("SOG: " + lastGPSUpdate.SOG);
+                Debug.Log("Lat: " + lastGPSUpdate.Latitude);
+                Debug.Log("Lon: " + lastGPSUpdate.Longitude);
+            }
+#endif
+
         }
 
         public Vector2 GetLatLon
@@ -54,6 +87,13 @@ namespace Assets.Positional
         // Start is called before the first frame update
         void Start()
         {
+            InitializeGPSRetriever();
+            /* gpsRetriever = new DataRetriever(DataConnections.PhoneGPS, DataAdapters.GPSInfo, ParameterExtractors.None, this);
+            GPSTimer = new Timer(0.5f, updateGPS);
+            SetLightIntensity(); */
+        }
+        public void InitializeGPSRetriever()
+        {
             gpsRetriever = new DataRetriever(DataConnections.PhoneGPS, DataAdapters.GPSInfo, ParameterExtractors.None, this);
             GPSTimer = new Timer(0.5f, updateGPS);
             SetLightIntensity();
@@ -74,7 +114,7 @@ namespace Assets.Positional
             playerLight.intensity = value;
         }
 
-        public void EnsureMainCamera ()
+        public void EnsureMainCamera()
         {
             if (!mainCamera)
             {
@@ -114,16 +154,16 @@ namespace Assets.Positional
             if (lastGPSUpdate != null && lastGPSUpdate.Valid)
             {
                 GPSUtils.Instance.GeodeticToEnu(
-                    lat, lon, 0, 
-                    lastGPSUpdate.Latitude, lastGPSUpdate.Longitude, 0, 
+                    lat, lon, 0,
+                    lastGPSUpdate.Latitude, lastGPSUpdate.Longitude, 0,
                     out x, out y, out z
                 );
             }
             else
             {
                 GPSUtils.Instance.GeodeticToEnu(
-                    lat, lon, 0, 
-                    Config.Instance.conf.NonVesselSettings["Latitude"], Config.Instance.conf.NonVesselSettings["Longitude"], 0, 
+                    lat, lon, 0,
+                    Config.Instance.conf.NonVesselSettings["Latitude"], Config.Instance.conf.NonVesselSettings["Longitude"], 0,
                     out x, out y, out z
                 );
             }
@@ -147,7 +187,11 @@ namespace Assets.Positional
             }
             else
             {
-                Debug.Log("Invalid GPS. Using default.");
+#if UNITY_EDITOR
+                //this was added to keep the console clean.
+                if (this.debugVesselInfoInEditor)
+                    Debug.Log("Invalid GPS. Using default.");
+#endif
                 lat = Config.Instance.conf.NonVesselSettings["Latitude"];
                 lon = Config.Instance.conf.NonVesselSettings["Longitude"];
             }
@@ -178,8 +222,10 @@ namespace Assets.Positional
             float CurrentHDGVessel = lastGPSUpdate != null && lastGPSUpdate.Valid ? (float)lastGPSUpdate.Heading : 0;
             float UpdateDiff = CurrentHDGVessel - CalibrationHDGVessel;
 
-            Debug.Log("Unity to true north");
             unityToTrueNorthRotation = Quaternion.Euler(0, -(CalibrationDiff + UpdateDiff), 0);
+
+            Debug.Log("Unity to true north: "+ unityToTrueNorthRotation);
+
         }
     }
 

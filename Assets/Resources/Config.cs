@@ -17,6 +17,9 @@ namespace Assets.Resources
         public Config()
         {
             conf = JsonConvert.DeserializeObject<Conf>(AssetManager.Instance.config["generic"].text);
+            // we have to set this from here to make sure this is set on Start when config is initialized
+            conf.PhoneGPS["IP"] = PlayerPrefs.GetString("GPSIP", "");
+            Debug.LogWarning("Attention: We overwrite the config file PhoneGPS IP value and take the value from the PlayerPrefs..");
             barentswatch = JsonConvert.DeserializeObject<BarentsConf>(AssetManager.Instance.config["barentswatch"].text);
         }
 

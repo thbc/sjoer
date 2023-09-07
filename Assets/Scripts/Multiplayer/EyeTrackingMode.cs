@@ -33,7 +33,8 @@ public class EyeTrackingMode : MonoBehaviour
     }
     private void DisableOnStart_Delayed()
     {
-        SetEyeTrackingMode();
+        DisableEyeTracking();
+        isEyeTracking = false;
     }
 
     public bool SetEyeTrackingMode()

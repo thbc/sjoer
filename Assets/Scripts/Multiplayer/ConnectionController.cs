@@ -1,11 +1,11 @@
-﻿using System;
+using System;
 using System.Collections;
 using System.Collections.Generic;
 using System.Linq;
 using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
-
+using Assets.Resources;
 public class ConnectionController : MonoBehaviour
 {
     public OSC osc;
@@ -35,7 +35,7 @@ public class ConnectionController : MonoBehaviour
 
     }
 
-  
+
     public static bool IsValidIP(string ipString)
     {
         if (String.IsNullOrWhiteSpace(ipString))
@@ -72,8 +72,8 @@ public class ConnectionController : MonoBehaviour
     [System.Serializable]
     public class PlayerConfig
     {
-        public string gpsIP;
-        public int gpsPort = 6000;
+       // public string gpsIP;
+      //  public int gpsPort = 6000;
         public string partnerDeviceIP;
         public int inPort;
         public int outPort;
@@ -88,9 +88,10 @@ public class ConnectionController : MonoBehaviour
             {
                 return _playerSelection;
             }
-            set { 
+            set
+            {
                 _playerSelection = value;
-                
+
                 switch (value)
                 {
                     case PlayerSelection.Player_1:
@@ -107,15 +108,19 @@ public class ConnectionController : MonoBehaviour
                         outPort = port_1;
                         break;
                 }
+                Debug.Log("Player selection value was set to: "+ _playerSelection+ " port 1 :" + port_1+ " port 2: " + port_2);
             }
         }
         public enum PlayerSelection
         {
-            Player_1, Player_2, TestMode
+           Undefined, Player_1, Player_2, TestMode
         }
 
-       
-  
+
+        public void DebugConfig()
+        {
+            Debug.Log("Debug Config: " + "\n" + "Player Selection: "+ playerSelection.ToString() + "\n" + "Partner Device IP: "+ partnerDeviceIP + "\n" + "GPS IP: "+ Config.Instance.conf.PhoneGPS["IP"]);
+        }
 
     }
     public PlayerConfig playerConfig = new PlayerConfig();
@@ -125,18 +130,41 @@ public class ConnectionController : MonoBehaviour
     {
         PlayerConfig loadedPlayerConfig = new PlayerConfig();
         loadedPlayerConfig.partnerDeviceIP = PlayerPrefs.GetString("PartnerDeviceIP", "");
-        loadedPlayerConfig.gpsIP = PlayerPrefs.GetString("GPSIP", "");
+        Config.Instance.conf.PhoneGPS["IP"] = PlayerPrefs.GetString("GPSIP", "");
 
-        //string _storedPlayerSel = PlayerPrefs.GetString("PlayerSelection", "");
-        //if (_storedPlayerSel == "Player_1")
-        //    loadedPlayerConfig.playerSelection = PlayerSelection.Player_1;
-        //else if (_storedPlayerSel == "Player_2")
-        //    loadedPlayerConfig.playerSelection = PlayerSelection.Player_2;
+        //loadedPlayerConfig.gpsIP = PlayerPrefs.GetString("GPSIP", "");
+        string _storedPlayerSel = PlayerPrefs.GetString("PlayerSelection","");
+        if (_storedPlayerSel == "Player_1")
+        {
+            loadedPlayerConfig.playerSelection = PlayerConfig.PlayerSelection.Player_1;
+                Debug.Log("loaded player: "+ _storedPlayerSel);
+        
+        }
+        else if (_storedPlayerSel == "Player_2")
+        {
+            loadedPlayerConfig.playerSelection = PlayerConfig.PlayerSelection.Player_2;
+            Debug.Log("loaded player: "+ _storedPlayerSel);
 
-        if (!string.IsNullOrWhiteSpace(loadedPlayerConfig.partnerDeviceIP))// && !string.IsNullOrWhiteSpace(_storedPlayerSel))
+        }
+        else if (string.IsNullOrEmpty(_storedPlayerSel))
+        {
+            Debug.Log("loaded no player selection ");
+
+
+        }
+
+
+        loadedPlayerConfig.DebugConfig();
+        if (!string.IsNullOrWhiteSpace(loadedPlayerConfig.partnerDeviceIP))// && (loadedPlayerConfig.playerSelection == PlayerConfig.PlayerSelection.Player_1 ||loadedPlayerConfig.playerSelection == PlayerConfig.PlayerSelection.Player_2))
+           {
+            Debug.Log("loaded config"); 
             return loadedPlayerConfig;
+           }
         else
+        {
+            Debug.LogWarning("No config data found.");
             return null;
+        }
     }
 
 
@@ -152,11 +180,14 @@ public class ConnectionController : MonoBehaviour
         if (_playerConfig2Store.partnerDeviceIP != "127.0.0.1")
         {
             PlayerPrefs.SetString("PartnerDeviceIP", _playerConfig2Store.partnerDeviceIP);
-              PlayerPrefs.Save();
-  }
+            PlayerPrefs.SetString("PlayerSelection", _playerConfig2Store.playerSelection.ToString());
+
+            PlayerPrefs.Save();
+            Debug.Log("stored player config: "+_playerConfig2Store.partnerDeviceIP +_playerConfig2Store.playerSelection.ToString());
+        }
         else
         { Debug.LogWarning("Did not store Partner device ip configuration, since partnerIP was localhost..."); }
-        
+
 
         // }
     }
@@ -167,11 +198,9 @@ public class ConnectionController : MonoBehaviour
         cursorMP.enabled = false;
         //DisplayConnectionSettings(false);
 
-        playerConfig.gpsIP = PlayerPrefs.GetString("GPSIP", "");
-        Debug.LogWarning(playerConfig.gpsIP);
-
-
-
+        //playerConfig.gpsIP = PlayerPrefs.GetString("GPSIP", "");
+        //playerConfig = LoadPlayerConfig(); --> this is done in MeuUIControl
+        //Debug.Log("Loaded previous config, starting connecting to: "+ playerConfig.gpsIP);
 
     }
 
@@ -185,20 +214,29 @@ public class ConnectionController : MonoBehaviour
             playerConfig.playerSelection = PlayerConfig.PlayerSelection.TestMode;
 
         statusLabel.text = playerConfig.playerSelection.ToString();
+        
+            PlayerPrefs.SetString("PlayerSelection", playerConfig.playerSelection.ToString());
 
-       
+            PlayerPrefs.Save();
+
+
         if (playerConfig.playerSelection == PlayerConfig.PlayerSelection.TestMode)
         {
             TryConnect();
         }
     }
 
-  
+
     public void TryConnect()
     {
+            PlayerPrefs.SetString("PartnerDeviceIP", playerConfig.partnerDeviceIP);
+            PlayerPrefs.Save();
 
-        if (osc.isInitialized)
-            Reconnect();
+        if (osc.isInitialized || osc.isReaderRunning)
+        {
+            Debug.LogWarning("OSC was initialized or OSC reader running. Resetting connection");
+           ResetConnection();
+        }
 
         if (playerConfig != null)
         {
@@ -209,7 +247,7 @@ public class ConnectionController : MonoBehaviour
 
 
             oscReceiver.SetupListener();
-            if(ConnectingCoroutine != null)
+            if (ConnectingCoroutine != null)
                 StopCoroutine(ConnectingCoroutine);
             ConnectingCoroutine = StartCoroutine(WaitForConnection());
 
@@ -218,7 +256,7 @@ public class ConnectionController : MonoBehaviour
         }
         else
         {
-            statusLabel.text = "Failed to connect to" + playerConfig.partnerDeviceIP+ "\n"
+            statusLabel.text = "Failed to connect to" + playerConfig.partnerDeviceIP + "\n"
                 + "Please change the connection settings.";
         }
     }
@@ -239,9 +277,9 @@ public class ConnectionController : MonoBehaviour
         }
 
         // .... if receivedPong = true this will be called once:
-        statusLabel.text = "Received pong "+ DateTime.Now.ToString()+"\n"+ playerConfig.playerSelection.ToString() + " with " +
+        statusLabel.text = "Received pong " + DateTime.Now.ToString() + "\n" + playerConfig.playerSelection.ToString() + " with " +
                 "\n" + "Partner Device: " + playerConfig.partnerDeviceIP
-                + "\n" + "OutPort: " + playerConfig.outPort.ToString() + "|InPort: " + playerConfig.inPort.ToString() ;
+                + "\n" + "OutPort: " + playerConfig.outPort.ToString() + "|InPort: " + playerConfig.inPort.ToString();
         // OnSuccessfullyConnected();
 
     }
@@ -249,7 +287,7 @@ public class ConnectionController : MonoBehaviour
 
 
 
-    void Reconnect()
+    void ResetConnection()//Reconnect()
     {
         if (ConnectingCoroutine != null)
         {
@@ -280,8 +318,8 @@ public class ConnectionController : MonoBehaviour
         cursorMP.enabled = true;
         statusLabel.text = "Successfully connected " + playerConfig.playerSelection.ToString() + " to " + playerConfig.partnerDeviceIP;
         isConnected = true;
-        
-        StorePlayerConfig(playerConfig);
+
+      //  StorePlayerConfig(playerConfig);
 
     }
 

@@ -58,8 +58,11 @@ namespace Assets.InfoItems
             {
                 infoItem.Update();
             }
-
+#if UNITY_EDITOR
+//this was added to keep the console clean.
+            if (Player.Instance.debugVesselInfoInEditor)
             Debug.Log($"There are {infoItems.Count} InfoItems in the scene.");
+#endif
         }
 
         protected abstract void RetrieveInfoItems();

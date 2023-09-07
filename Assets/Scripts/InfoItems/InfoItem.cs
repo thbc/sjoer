@@ -115,8 +115,11 @@ namespace Assets.InfoItems
             //}
             // First update the target from interactions
             Retarget();
-
-            Debug.Log($"{Key} = {this.meta.DesiredState}");
+#if UNITY_EDITOR
+//this was added to keep the console clean.
+            if (Player.Instance.debugVesselInfoInEditor)
+                Debug.Log($"{Key} = {this.meta.DesiredState}");
+#endif
 
             /*  // send MARKED object to other devices
              if(gameObject?.tag == "MARKED")
@@ -163,7 +166,7 @@ namespace Assets.InfoItems
                             MarkerMode.Instance.SendMarker(this.dto.Key);
                         }
                     }
-                    else if(this.meta.DesiredState == ExpandState.Collapsed && this.gameObject.tag == "MARKED")
+                    else if (this.meta.DesiredState == ExpandState.Collapsed && this.gameObject.tag == "MARKED")
                     {
                         MarkerMode.Instance.UnmarkItem(this.gameObject);
                     }
