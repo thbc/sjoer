@@ -26,7 +26,7 @@ namespace Assets.Positional
         {
             lastGPSUpdate = (AISDTO)await gpsRetriever.fetch();
 
-           Debug.Log("Lat: " + lastGPSUpdate.Latitude +"Lon: " + lastGPSUpdate.Longitude +"Heading: " + lastGPSUpdate.Heading +"SOG: " + lastGPSUpdate.SOG);
+            Debug.Log("Lat: " + lastGPSUpdate.Latitude + "Lon: " + lastGPSUpdate.Longitude + "Heading: " + lastGPSUpdate.Heading + "SOG: " + lastGPSUpdate.SOG);
             if (lastGPSUpdate != null && lastGPSUpdate.Valid)
             {
                 if (DebugOnHead.Instance.gameObject.activeInHierarchy)
@@ -206,8 +206,24 @@ namespace Assets.Positional
         // The rotation that transforms the Unity north axis to True north
         // This should only be executed when Hololens and vessel are aligned
         // (and thus vessel compass information and Hololens direction match)
-        public void calibrate()
+
+        #region new added, not part of original script
+        Camera calibrationCam;
+        public void PrepareCalibration(Camera _calibCam)
         {
+            calibrationCam = _calibCam;
+            mainCamera = calibrationCam;
+            SetLightIntensity();
+        }
+        public void FinishCalibration()
+        {
+            mainCamera = null;
+            this.EnsureMainCamera();
+        }
+       
+        #endregion
+        public void calibrate()
+        {            
             this.unitytoTrueNorth(true);
         }
         private void unitytoTrueNorth(bool calibrate = false)
@@ -224,7 +240,7 @@ namespace Assets.Positional
 
             unityToTrueNorthRotation = Quaternion.Euler(0, -(CalibrationDiff + UpdateDiff), 0);
 
-            Debug.Log("Unity to true north: "+ unityToTrueNorthRotation);
+            Debug.Log("Unity to true north: " + unityToTrueNorthRotation);
 
         }
     }

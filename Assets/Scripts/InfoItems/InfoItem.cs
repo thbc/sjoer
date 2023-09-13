@@ -162,12 +162,14 @@ namespace Assets.InfoItems
                     {
                         if (MarkerMode.Instance.allowMarking)
                         {
-                            //  this.gameObject.tag = "MARKED";
+
+                            // this calls SendMarker as soon as allowMarking is true. In MarkerMode we check whether connection is established before sending it
                             MarkerMode.Instance.SendMarker(this.dto.Key);
                         }
                     }
-                    else if (this.meta.DesiredState == ExpandState.Collapsed && this.gameObject.tag == "MARKED")
+                    else if (this.meta.DesiredState == ExpandState.Collapsed && this.gameObject.tag == "MARKED") // only for the received markers
                     {
+                        // this is happenning locally on any items that were received via OSC to be marked
                         MarkerMode.Instance.UnmarkItem(this.gameObject);
                     }
 

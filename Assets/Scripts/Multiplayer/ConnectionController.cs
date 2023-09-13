@@ -80,6 +80,8 @@ public class ConnectionController : MonoBehaviour
 
         private int port_1 = 6969;
         private int port_2 = 7070;
+        public bool isEyeTracking;
+        public bool sendMarkerMultiplayer;
 
         private PlayerSelection _playerSelection;
         public PlayerSelection playerSelection
@@ -131,7 +133,14 @@ public class ConnectionController : MonoBehaviour
         PlayerConfig loadedPlayerConfig = new PlayerConfig();
         loadedPlayerConfig.partnerDeviceIP = PlayerPrefs.GetString("PartnerDeviceIP", "");
         Config.Instance.conf.PhoneGPS["IP"] = PlayerPrefs.GetString("GPSIP", "");
-
+        int _markMode = PlayerPrefs.GetInt("MultiplayerMarkMode", 0);
+        if(_markMode == 0)
+            loadedPlayerConfig.sendMarkerMultiplayer = false;
+        if(_markMode == 1)
+            loadedPlayerConfig.sendMarkerMultiplayer = true;
+        
+        MarkerMode.Instance.SetMarkMode(loadedPlayerConfig.sendMarkerMultiplayer);
+        
         //loadedPlayerConfig.gpsIP = PlayerPrefs.GetString("GPSIP", "");
         string _storedPlayerSel = PlayerPrefs.GetString("PlayerSelection","");
         if (_storedPlayerSel == "Player_1")
@@ -280,6 +289,7 @@ public class ConnectionController : MonoBehaviour
         statusLabel.text = "Received pong " + DateTime.Now.ToString() + "\n" + playerConfig.playerSelection.ToString() + " with " +
                 "\n" + "Partner Device: " + playerConfig.partnerDeviceIP
                 + "\n" + "OutPort: " + playerConfig.outPort.ToString() + "|InPort: " + playerConfig.inPort.ToString();
+
         // OnSuccessfullyConnected();
 
     }

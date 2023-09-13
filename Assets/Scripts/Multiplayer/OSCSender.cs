@@ -53,5 +53,15 @@ public class OSCSender : MonoBehaviour
         Debug.Log("sent " + message.ToString());
     }
 
+    public void SendUnmarked(string _vesselName)
+    {
+        OscMessage message = new OscMessage();
+        message.address = "/unmarked";
+        message.values.Add(_vesselName);
+       
+        osc.Send(message);
+
+        Debug.Log("sent unmarked " + message.ToString());
+    }
    
 }

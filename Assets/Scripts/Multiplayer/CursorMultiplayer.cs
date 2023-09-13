@@ -25,7 +25,7 @@ public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
 
     public void OnSourceDetected(SourceStateEventData eventData)
     {
-        if (eventData.Controller != null && eventData.Controller.ControllerHandedness == Handedness.Right)
+        if (eventData.Controller != null && eventData.Controller.ControllerHandedness == Handedness.Left)
         {
             p = eventData.Controller.InputSource.Pointers.FirstOrDefault();
             SetupPointer();
@@ -36,7 +36,7 @@ public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
 
     public void OnSourceLost(SourceStateEventData eventData)
     {
-        if (p != null && eventData.Controller != null && eventData.Controller.ControllerHandedness == Handedness.Right)
+        if (p != null && eventData.Controller != null && eventData.Controller.ControllerHandedness == Handedness.Left)
         {
             p = null;
         }
@@ -101,11 +101,11 @@ public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
 
     private void OnPrimaryPointerChanged(IMixedRealityPointer oldPointer, IMixedRealityPointer newPointer)
     {
-        // this is for only right hand tracking
+        // this is for only Left hand tracking
 
         if (newPointer != null
             && newPointer.Controller != null
-            && newPointer.Controller.ControllerHandedness == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Right)
+            && newPointer.Controller.ControllerHandedness == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
         {
             p = newPointer;
             SetupPointer();

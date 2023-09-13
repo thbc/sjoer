@@ -11,8 +11,8 @@ public class EyeTrackingMode : MonoBehaviour
 {
     public static EyeTrackingMode Instance { get; private set; }
 
-
-    bool isEyeTracking = true; // on start this is set to false
+    [HideInInspector]
+    public bool isEyeTracking = true; // on start this is set to false
 
 
     void Awake()

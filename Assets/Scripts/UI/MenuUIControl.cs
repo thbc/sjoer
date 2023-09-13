@@ -22,7 +22,7 @@ public class MenuUIControl : MonoBehaviour
     public GameObject debugMenu;
 
 
-    public GameObject markModeBtn;
+    public TextMesh markModeBtnLabel;
     public GameObject eyeTrackingModeBtn;
 
 
@@ -63,6 +63,8 @@ public class MenuUIControl : MonoBehaviour
                 DisplayConnectionSettings(true);
                 DisplayPlayerSelectionMenu(true);
             }
+
+            InitMarkModeUI();
 
             hasLoadedConfig = true;
         }
@@ -339,17 +341,28 @@ public class MenuUIControl : MonoBehaviour
         }
     }
     //end GPS
-
-    public void SetMarkMode(TextMesh buttonLabel)
+    void InitMarkModeUI()
+    {
+       bool nextstate = MarkerMode.Instance.allowMarking;
+        if (nextstate == true)
+        {
+            markModeBtnLabel.text = "Deactivate Marking";
+        }
+        else if (nextstate == false)
+        {
+            markModeBtnLabel.text = "Activate Marking";
+        } 
+    }
+    public void SetMarkMode()
     {
         bool nextstate = MarkerMode.Instance.SetMarkMode();
         if (nextstate == true)
         {
-            buttonLabel.text = "Deactivate Marking";
+            markModeBtnLabel.text = "Deactivate Marking";
         }
         else if (nextstate == false)
         {
-            buttonLabel.text = "Activate Marking";
+            markModeBtnLabel.text = "Activate Marking";
         }
     }
     public void SetEyeTrackingMode(TextMesh buttonLabel)

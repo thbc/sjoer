@@ -7,11 +7,20 @@ using Assets.SceneManagement;
 using Assets.Positional;
 using Assets.HelperClasses;
 using TMPro;
+using UnityEngine.Experimental.GlobalIllumination;
 
 namespace Assets.Calibration
 {
     public class Calibrator : MonoBehaviour
     {
+        
+         #region new added, not part of original script
+        public Camera calibrationCam;
+        public GameObject calibrationAligner;
+      //  public GameObject pointLight;
+        #endregion
+
+
         [SerializeField]
         private TextMeshProUGUI countDown;
 
@@ -19,8 +28,7 @@ namespace Assets.Calibration
         private Quaternion rot = Quaternion.identity;
         private Vector3 pos = Vector3.zero;
         private DateTime startTime;
-
-        // Start is called before the first frame update
+        /* 
         void Start()
         {
             Debug.Log("Calibrating. Hold head steady for 3 seconds.");
@@ -32,9 +40,33 @@ namespace Assets.Calibration
                 this.calibrate
                 );
             this.startTime = DateTime.Now;
+        } */
+
+        void OnEnable()
+        {
+            calibrationCam.gameObject.SetActive(true);
+            calibrationAligner.gameObject.SetActive(true);
+            //pointLight.SetActive(true);
+            Player.Instance.PrepareCalibration(calibrationCam);
+
+            Debug.Log("Calibrating. Hold head steady for 3 seconds.");
+            Player.Instance.EnsureMainCamera();
+            Player.Instance.SetLightIntensity(5);
+
+            this.steadyTimer = new Timer(
+                (float)Config.Instance.conf.CalibrationSettings["SteadyTime"],
+                this.calibrate
+                );
+            this.startTime = DateTime.Now;
+        }
+        void OnDisable()
+        {
+            calibrationCam.gameObject.SetActive(false);
+            calibrationAligner.gameObject.SetActive(false);
+          //  pointLight.SetActive(false);
         }
 
-        // Update is called once per frame
+      
         void Update()
         {
             // We need to manually call the update of the Timer instance
@@ -86,7 +118,9 @@ namespace Assets.Calibration
         private void calibrate()
         {
             Player.Instance.calibrate();
-            MySceneManager.Instance.exitCalibration();
+            Player.Instance.FinishCalibration();
+            this.enabled = false;
+            //MySceneManager.Instance.exitCalibration();
         }
     }
 }

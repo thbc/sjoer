@@ -23,6 +23,8 @@ public class OSCReceiver : MonoBehaviour
 
         osc.SetAddressHandler("/cursorPos", OnReceiveCursorPos); 
         osc.SetAddressHandler("/marked", OnReceiveMark);
+        osc.SetAddressHandler("/unmarked", OnReceiveUnmark);
+
     }
 
     public bool _receivedPing;
@@ -76,35 +78,18 @@ public class OSCReceiver : MonoBehaviour
         }
     }
     
-    //TODO: create list of marked strings and check if "s" already exists
     void OnReceiveMark(OscMessage message)
     {
         string sO = message.ToString();
         string s = sO.Replace(@"/marked ", "");
-        if(MarkerMode.Instance.IsVesselMarked(s)) return;
-        s = s + " (HorizonPlane)";
-        GameObject vesselGO;
-         Debug.Log("received mark: " + s);       
-
-        if (GameObject.Find(s))
-        {
-            vesselGO = GameObject.Find(s);
-            if (vesselGO.tag == "MARKED") return;
-
-            MarkerMode.Instance.MarkItem(vesselGO);
-        }
-        else
-        {
-            s = "[T] " + s;
-            if(GameObject.Find(s))
-            {
-                vesselGO = GameObject.Find(s);
-                if (vesselGO.tag == "MARKED") return;
-
-                MarkerMode.Instance.MarkItem(vesselGO);
-            }
-        }
+        MarkerMode.Instance.OnMarkItemReceived(s);
     }
 
+void OnReceiveUnmark(OscMessage message)
+    {
+        string sO = message.ToString();
+        string s = sO.Replace(@"/unmarked ", "");
+        MarkerMode.Instance.OnUnmarkItemReceived(s);
+    }
 
 }
