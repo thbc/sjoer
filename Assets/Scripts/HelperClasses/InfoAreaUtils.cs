@@ -21,10 +21,10 @@ namespace Assets.HelperClasses
                     (float)Config.Instance.conf.VesselSettingsD["BridgeHeight"] - (float)Config.Instance.conf.DataSettings["UIElementHeight"], // newPosition.y > align with the horizon. TODO: Get layer number
                     newPosition.z
                 );
-            
+
         }
 
-        public Vector3 UnityCoordsToSkyArea(Vector3 obj,  ExpandState expandState, Player player)
+        public Vector3 UnityCoordsToSkyArea(Vector3 obj, ExpandState expandState, Player player)
         {
             Vector3 tmp = UnityCoordsToHorizonPlane(obj, player.mainCamera.transform.position);
             return new Vector3(
@@ -45,7 +45,7 @@ namespace Assets.HelperClasses
         public Vector3 CircleTToVector3(float t, float height, Vector3 center)
         {
             Vector3 up = center + Vector3.forward + new Vector3(0, height, 0);
-            Vector3 ret = (Quaternion.AngleAxis(t, Vector3.up) * up).normalized * (float) Config.Instance.conf.UISettings["HorizonPlaneRadius"];
+            Vector3 ret = (Quaternion.AngleAxis(t, Vector3.up) * up).normalized * (float)Config.Instance.conf.UISettings["HorizonPlaneRadius"];
 
             return ret;
         }
@@ -125,14 +125,14 @@ namespace Assets.HelperClasses
         // Calculates the new position on the SkyArea/HoriznPlane after moving by xDist
         public Vector3 MoveAlongX(Vector3 obj, float dist, Vector3 player)
         {
-            float angle = (float) (Math.PI - 2 * Math.Acos(
+            float angle = (float)(Math.PI - 2 * Math.Acos(
                 (dist / 2) / Config.Instance.conf.UISettings["HorizonPlaneRadius"]));
             return Quaternion.Euler(0, RadiansToDegrees(angle), 0) * (obj - player);
         }
 
         float RadiansToDegrees(float radians)
         {
-            return radians * (float) (180 / Math.PI);
+            return radians * (float)(180 / Math.PI);
         }
 
         float DegreesToRadians(float degrees)
@@ -157,14 +157,14 @@ namespace Assets.HelperClasses
 
             boxCollider.size = new Vector3(boxCollider.size.x, def ? 3 : boxCollider.size.y + (numInfo - 1) * boxCollider.size.y, boxCollider.size.z);
             boxCollider.center = new Vector3(boxCollider.center.x, def ? 1.5f : boxCollider.size.y / 2, boxCollider.center.z);
-       
-       if(!def)
-       {
-         GameObject defT = target.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject;
-         if(defT.tag == "MARKED")
-         defT.GetComponent<MeshRenderer>().material = MarkerMode.Instance.GetAssignedMaterial();
 
-       }
+            if (!def)
+            {
+                GameObject defT = target.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject;
+                if (defT.tag == "MARKED-sent" || defT.tag == "MARKED-received")
+                    defT.GetComponent<MeshRenderer>().material = MarkerMode.Instance.GetAssignedMaterial();
+
+            }
         }
 
         public void ToggleHelperStick(GameObject g, bool enable)
@@ -172,15 +172,15 @@ namespace Assets.HelperClasses
             GameObject helperStick = g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/StickConnection").gameObject;
             helperStick.SetActive(enable);
 
-          
- 
+
+
 
 
         }
 
         public void ToggleAISPinOverflowVisible(GameObject g, ExpandState expandState)
         {
-            int n = (int) Config.Instance.conf.DataSettings["NumItemsOnHover"];
+            int n = (int)Config.Instance.conf.DataSettings["NumItemsOnHover"];
 
             GetAISPinComponent(g, "1Label").enabled = n > 1 && expandState != ExpandState.Collapsed;
             GetAISPinComponent(g, "1Value").enabled = n > 1 && expandState != ExpandState.Collapsed;
@@ -191,8 +191,8 @@ namespace Assets.HelperClasses
 
             // Lastly enable/disable the target image
             g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/TopPinAnchor/TopPinAnchor2/CanvasTxt/Target").GetComponent<Image>().enabled = expandState == ExpandState.Target; ;
-       
-        
+
+
         }
 
         public void ToggleTargetActive(GameObject g, ExpandState expandState)
@@ -219,7 +219,7 @@ namespace Assets.HelperClasses
             //distanceRuler.transform.localScale = new Vector3(def ? 0.1f : distanceRuler.transform.localScale.x * (1 / scale), distanceRuler.transform.localScale.y, distanceRuler.transform.localScale.z);
 
             boxCollider.size = new Vector3(boxCollider.size.x, def ? 3.25f : boxCollider.size.y + (scale / boxCollider.size.y) * boxCollider.size.y, boxCollider.size.z);
-            boxCollider.center = new Vector3(boxCollider.center.x, def ? 1.625f :  boxCollider.center.y + (scale / boxCollider.center.y) * boxCollider.center.y, boxCollider.center.z);
+            boxCollider.center = new Vector3(boxCollider.center.x, def ? 1.625f : boxCollider.center.y + (scale / boxCollider.center.y) * boxCollider.center.y, boxCollider.center.z);
         }
 
         public float GetStickScale(GameObject target)

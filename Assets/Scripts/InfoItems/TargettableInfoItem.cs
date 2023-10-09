@@ -1,8 +1,8 @@
 ﻿using Assets.Resources;
+using Microsoft.MixedReality.OpenXR;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine;
-
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
 
@@ -37,6 +37,7 @@ namespace Assets.InfoItems
         private bool target = false;
         private bool hover = false;
         private TargettableInfoItem link = null;
+        public Microsoft.MixedReality.Toolkit.Utilities.Handedness Hand { get; private set; }
 
         public bool IsTarget
         {
@@ -72,14 +73,14 @@ namespace Assets.InfoItems
             //Debug.Log("target is now " + target);
             if (HasLinkedInfoItem()) link.IsTarget = target;
 
-             
-             /*    Debug.LogWarning(this.gameObject.name);
-            if(Marker.Instance.allowMarking)
-            {
-              //  this.gameObject.tag = "MARKED";
-              if(this.gameObject.name.Contains("HorizonPlane"))
-                   Marker.Instance.SendMarker(this.gameObject.name);
-            } */
+
+            /*    Debug.LogWarning(this.gameObject.name);
+           if(Marker.Instance.allowMarking)
+           {
+             //  this.gameObject.tag = "MARKED";
+             if(this.gameObject.name.Contains("HorizonPlane"))
+                  Marker.Instance.SendMarker(this.gameObject.name);
+           } */
         }
 
         public void OnHoverStart()
@@ -94,36 +95,36 @@ namespace Assets.InfoItems
                 link.IsHover = hover;
             }
 
-        /*     Debug.LogWarning(this.gameObject.name);
-            if(Marker.Instance.allowMarking)
-            {
-              //  this.gameObject.tag = "MARKED";
-              if(this.gameObject.name.Contains("HorizonPlane"))
-                   Marker.Instance.SendMarker(this.gameObject.name);
-            } */
+            /*     Debug.LogWarning(this.gameObject.name);
+                if(Marker.Instance.allowMarking)
+                {
+                  //  this.gameObject.tag = "MARKED";
+                  if(this.gameObject.name.Contains("HorizonPlane"))
+                       Marker.Instance.SendMarker(this.gameObject.name);
+                } */
 
 
         }
 
-/*         public void OnNetworkMarked()
-        {
-             Debug.Log("Network Hover start");
-         
-                OnSelect();
-            this.gameObject.tag = "MARKED";
+        /*         public void OnNetworkMarked()
+                {
+                     Debug.Log("Network Hover start");
 
-            this.gameObject.transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = Marker.Instance.GetMarkedMaterial();;
+                        OnSelect();
+                    this.gameObject.tag = "MARKED";
+
+                    this.gameObject.transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = Marker.Instance.GetMarkedMaterial();;
 
 
 
-        } */
+                } */
 
         public void OnHoverEnd()
         {
             Debug.Log("Hover end");
             // Define ms how long it takes before an infoitem disappears when looking at it
             Invoke("InnerOnHoverEnd", (float)Config.Instance.conf.DataSettings["OnLookAwayDisappearDelay"]);
-        
+
             /* if(this.gameObject.tag == "MARKED")
             {
                 this.gameObject.transform.Find("default").GetComponent<MeshRenderer>().material = Marker.Instance.GetAssignedMaterial();
@@ -148,13 +149,22 @@ namespace Assets.InfoItems
                 link.IsTarget = true;
             }
         }
-
         public override void OnInputDown(InputEventData eventData)
+        {
+            if (eventData.MixedRealityInputAction == selectAction)
+            {
+                // Capture the hand data
+                Hand = eventData.Handedness;
+
+                OnClick();
+            }
+        }
+        /* public override void OnInputDown(InputEventData eventData)
         {
             if (eventData.MixedRealityInputAction == selectAction)
             {
                 OnClick();
             }
-        }
+        } */
     }
 }

@@ -116,13 +116,13 @@ namespace Assets.InfoItems
             // First update the target from interactions
             Retarget();
 #if UNITY_EDITOR
-//this was added to keep the console clean.
+            //this was added to keep the console clean.
             if (Player.Instance.debugVesselInfoInEditor)
                 Debug.Log($"{Key} = {this.meta.DesiredState}");
 #endif
 
             /*  // send MARKED object to other devices
-             if(gameObject?.tag == "MARKED")
+             if(gameObject?.tag == "MARKED-received")
              {
                  Debug.LogWarning("MARKED "+ gameObject.name);
                  GameObject.Find("default").GetComponent<MeshRenderer>().material = Marker.Instance.GetAssignedMaterial();
@@ -158,20 +158,98 @@ namespace Assets.InfoItems
                 if (DisplayArea == DisplayArea.HorizonPlane)
                 {
                     UpdateTargetNum();
-                    if (this.meta.DesiredState == ExpandState.Target)
+
+                    // dont proceed if hand info does not exist
+                    if (targetHandler == null)
+                        return;
+
+                    if (GetTargetHandler().IsTarget)
                     {
-                        if (MarkerMode.Instance.allowMarking)
+                        Debug.Log("is target");
+
+                        // left hand interaction for Maxmizing collapsed objects
+                        if (MarkerMode.Instance.allowMarking && targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
                         {
 
                             // this calls SendMarker as soon as allowMarking is true. In MarkerMode we check whether connection is established before sending it
                             MarkerMode.Instance.SendMarker(this.dto.Key);
                         }
+
+                        // Optional :
+                        // right hand interaction for Maxmizing collapsed objects
+                        // currently not implemented since right hand maximizing is handled locally previously in InfoItem
+                        //else if (MarkerMode.Instance.allowMarking && targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Right)
+                        //{ 
+                        //}
+
+
                     }
-                    else if (this.meta.DesiredState == ExpandState.Collapsed && this.gameObject.tag == "MARKED") // only for the received markers
+                    else if (!GetTargetHandler().IsTarget)
                     {
-                        // this is happenning locally on any items that were received via OSC to be marked
-                        MarkerMode.Instance.UnmarkItem(this.gameObject);
+                        Debug.Log("not target");
+                        // left hand interaction for  Minimizing expanded objects 
+                        if (targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
+                        {
+                            // if the sentMarker is unmarked by the sender (sending-user)
+                            if (this.gameObject.tag == "MARKED-sent")
+                            {
+                                // this is happenning locally on any items that were received via OSC to be marked
+                                MarkerMode.Instance.UnmarkSentItem(this.gameObject);
+                            }
+                        }
+                        // right hand interaction for  Minimizing expanded objects 
+                        if (targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Right)
+                        {
+                            // if the receivedMarker is unmarked by the receiver (receiving-user)
+                            if (this.gameObject.tag == "MARKED-received")
+                            {
+                                // this is happenning locally on any items that were received via OSC to be marked
+                                MarkerMode.Instance.UnmarkReceivedItem(this.gameObject);
+                            }
+                        }
                     }
+                    /* if (this.meta.CurrentState == ExpandState.Target)
+                    {
+                        
+                        // left hand interaction for  Minimizing expanded objects 
+                        if (targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
+                        {
+                            // if the sentMarker is unmarked by the sender (sending-user)
+                            if (this.gameObject.tag == "MARKED-sent")
+                            {
+                                // this is happenning locally on any items that were received via OSC to be marked
+                                MarkerMode.Instance.UnmarkSentItem(this.gameObject);
+                            }
+                        }
+                        // right hand interaction for  Minimizing expanded objects 
+                        if (targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Right)
+                        {
+                            // if the receivedMarker is unmarked by the receiver (receiving-user)
+                            if (this.gameObject.tag == "MARKED-received")
+                            {
+                                // this is happenning locally on any items that were received via OSC to be marked
+                                MarkerMode.Instance.UnmarkReceivedItem(this.gameObject);
+                            }
+                        }
+                    }
+                    else if (this.meta.CurrentState == ExpandState.Collapsed)// && this.gameObject.tag != "Untagged") //interaction for  Minimizing expanded objects that are either marked or MARKED-sent
+                    {
+                        // left hand interaction for Maxmizing collapsed objects
+                        if (MarkerMode.Instance.allowMarking && targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
+                        {
+
+                            // this calls SendMarker as soon as allowMarking is true. In MarkerMode we check whether connection is established before sending it
+                            MarkerMode.Instance.SendMarker(this.dto.Key);
+                        }
+
+                        // Optional :
+                        // right hand interaction for Maxmizing collapsed objects
+                        // currently not implemented since right hand maximizing is handled locally previously in InfoItem
+                        //else if (MarkerMode.Instance.allowMarking && targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Right)
+                        //{ 
+                        //}
+
+                    } */
 
                 }
 

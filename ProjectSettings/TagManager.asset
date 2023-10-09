@@ -6,9 +6,9 @@ TagManager:
   tags:
   - playerCube
   - cursorHighlight
-  - MARKED
   - MenuSelector
-  - MARKEDout
+  - MARKED-received
+  - MARKED-sent
   layers:
   - Default
   - TransparentFX

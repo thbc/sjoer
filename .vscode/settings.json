@@ -52,5 +52,6 @@
         "temp/":true,
         "Temp/":true
     },
-    "dotnet.defaultSolution": "sjoer.sln"
+    "dotnet.defaultSolution": "sjoer.sln",
+    "dotnet.preferCSharpExtension": true
 }

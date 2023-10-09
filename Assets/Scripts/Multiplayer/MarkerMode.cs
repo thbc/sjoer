@@ -18,9 +18,9 @@ public class MarkerMode : MonoBehaviour
         *invokes a click on the responding InfoItem,
         *marks it with the yellow material,
         *adds its name to a string List "recvMarkedVessels",
-        *changes the gameObject's tag to "Marked"
+        *changes the gameObject's tag to "MARKED-received"
 
-    In InfoItem, if allowMarking is enabled and an gameObject is tagged as "marked", we call the MarkerMode "UnmarkItem(GameObject)" which:
+    In InfoItem, if allowMarking is enabled and an gameObject is tagged as "MARKED-received", we call the MarkerMode "UnmarkItem(GameObject)" which:
         *resets the gameObject tag to "Untagged"
         *resets its material to the default one
         *removes its name from the recvMarkedVessels List
@@ -106,7 +106,7 @@ public class MarkerMode : MonoBehaviour
         if (GameObject.Find(s))
         {
             vesselGO = GameObject.Find(s);
-            if (vesselGO.tag == "MARKED") return;
+            if (vesselGO.tag == "MARKED-received") return;
 
             MarkItemReceived(vesselGO);
         }
@@ -116,7 +116,7 @@ public class MarkerMode : MonoBehaviour
             if (GameObject.Find(s))
             {
                 vesselGO = GameObject.Find(s);
-                if (vesselGO.tag == "MARKED") return;
+                if (vesselGO.tag == "MARKED-received") return;
 
                 MarkItemReceived(vesselGO);
             }
@@ -125,12 +125,20 @@ public class MarkerMode : MonoBehaviour
     void MarkItemReceived(GameObject vesselGO)
     {
         Debug.LogWarning("found: " + vesselGO.name);
-        vesselGO.gameObject.tag = "MARKED";
+        vesselGO.gameObject.tag = "MARKED-received";
         vesselGO.GetComponent<TargettableInfoItem>().OnClick(); // trying to open item through OnClick function
         vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetMarkedMaterial();
         AddVesselReceived(vesselGO.name);
     }
-    public void UnmarkItem(GameObject vesselGO)
+    
+    #endregion
+
+    #region Interaction with unmarking items
+    /// <summary>
+    /// Triggered from interaction with InfoItem. Called if object was a sent marker.
+    /// </summary>
+    /// 
+public void UnmarkSentItem(GameObject vesselGO)
     {
         Debug.LogWarning("UNMARK: " + vesselGO.name);
         vesselGO.gameObject.tag = "Untagged";
@@ -138,20 +146,41 @@ public class MarkerMode : MonoBehaviour
         RemoveVesselReceived(vesselGO.name);
 
         //TODO: send and notify Unmark to other player
+        sender.SendUnmarked(vesselGO.name);
+        //TODO2: trigger collapse --> is done already in InfoItem, but still needs to be done on-received
+
+    }
+     /// <summary>
+    /// Triggered from interaction with InfoItem. Called if object was a received marker.
+    /// </summary>
+    /// 
+    public void UnmarkReceivedItem(GameObject vesselGO)
+    {
+        Debug.LogWarning("UNMARK: " + vesselGO.name);
+        vesselGO.gameObject.tag = "Untagged";
+        vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetAssignedMaterial();
+        RemoveVesselReceived(vesselGO.name);
+
+        //TODO: send and notify Unmark to other player
+        sender.SendUnmarked(vesselGO.name);
+        //TODO2: trigger collapse --> is done already in InfoItem, but still needs to be done on-received
     }
     #endregion
-    #region This handling the sending of marker to other player and also marking it for the sender-client and adds to list for keeping track
-    // caled from InfoItem if allowMarking is true
+
+    #region Sending
+    /// <summary>
+    /// Handling the sending of marker to other player and also marking it for the sender-client and adds to list for keeping track.
+    /// Called from InfoItem if allowMarking is true.
+    /// </summary>
     public void SendMarker(string _vesselName)
     {
-        if (!sender.osc.isInitialized)
+        if (!sender.osc.isInitialized) //Should send Marker but OSC is not initialized yet..
             return;
-        //Should send Marker but OSC is not initialized yet..
 
         //Debug.LogWarning("Send MARKER: " + _vesselName);
         sender.SendMarked(_vesselName);
 
-        OnMarkItemSent(_vesselName);
+        OnMarkItemSent(_vesselName);    // mark as well for user who is sending the mark
     }
     public void OnMarkItemSent(string s)
     {
@@ -163,7 +192,7 @@ public class MarkerMode : MonoBehaviour
         if (GameObject.Find(s))
         {
             vesselGO = GameObject.Find(s);
-            if (vesselGO.tag == "MARKEDout") return;
+            if (vesselGO.tag == "MARKED-sent") return;
 
             MarkItemSent(vesselGO);
         }
@@ -173,7 +202,7 @@ public class MarkerMode : MonoBehaviour
             if (GameObject.Find(s))
             {
                 vesselGO = GameObject.Find(s);
-                if (vesselGO.tag == "MARKEDout") return;
+                if (vesselGO.tag == "MARKED-sent") return;
 
                 MarkItemSent(vesselGO);
             }
@@ -183,23 +212,27 @@ public class MarkerMode : MonoBehaviour
     public void MarkItemSent(GameObject vesselGO)
     {
         Debug.LogWarning("found: " + vesselGO.name);
-        vesselGO.gameObject.tag = "MARKEDout";
+        vesselGO.gameObject.tag = "MARKED-sent";
         vesselGO.GetComponent<TargettableInfoItem>().OnClick(); // trying to open item through OnClick function
         vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetMarkedSentMaterial();
         AddVesselSent(vesselGO.name);
     }
 
-     public void OnUnmarkItemReceived(string s)
+    public void OnUnmarkItemReceived(string s)
     {
-        if (!IsVesselMarkedSent(s)) return;
+        // !!! if unmarking via OSC is not working, try uncommenting this line
+        if (!IsVesselMarkedSent(s) && !IsVesselMarkedReceived(s)) return;
+        // if (!IsVesselMarkedSent(s)) return;
         s = s + " (HorizonPlane)";
         //Debug.Log("sending and marking mark: " + s);
         GameObject vesselGO;
         if (GameObject.Find(s))
         {
             vesselGO = GameObject.Find(s);
-            if (vesselGO.tag == "MARKEDout")
-            UnmarkItemReceived(vesselGO);
+            if (vesselGO.tag == "MARKED-sent")
+                ItemSent_receivedUnmark(vesselGO);
+            else if (vesselGO.tag == "MARKED-received")
+                ItemReceived_receivedUnmark(vesselGO);
         }
         else
         {   // this logic makes sure both expanded and collapses markers are found
@@ -207,12 +240,32 @@ public class MarkerMode : MonoBehaviour
             if (GameObject.Find(s))
             {
                 vesselGO = GameObject.Find(s);
-                if (vesselGO.tag == "MARKEDout")
-                UnmarkItemReceived(vesselGO);
+                if (vesselGO.tag == "MARKED-sent")
+                    ItemSent_receivedUnmark(vesselGO);
+                else if (vesselGO.tag == "MARKED-received")
+                    ItemReceived_receivedUnmark(vesselGO);
             }
-        }        
+        }
     }
-    void UnmarkItemReceived(GameObject vesselGO)
+    /// <summary>
+    /// This is called when osc receives "unmarking" from other player.
+    /// Only called if object was type of "received". Although when this player unmarks this object, that is handled in InfoItem,
+    /// we still need this function for the case that th other player sent this marker earlier and unmarked it now.
+    /// </summary>
+    /// <param name="vesselGO"></param>
+    void ItemReceived_receivedUnmark(GameObject vesselGO)
+    {
+        Debug.LogWarning("UNMARK: " + vesselGO.name);
+        vesselGO.gameObject.tag = "Untagged";
+        vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetAssignedMaterial();
+        RemoveVesselReceived(vesselGO.name);
+    }
+     /// <summary>
+    /// This is called when osc receives "unmarking" from other player.
+    /// Only called if object was type of "received".
+    /// </summary>
+    /// <param name="vesselGO"></param>
+    void ItemSent_receivedUnmark(GameObject vesselGO)
     {
         Debug.LogWarning("UNMARK: " + vesselGO.name);
         vesselGO.gameObject.tag = "Untagged";
@@ -221,16 +274,16 @@ public class MarkerMode : MonoBehaviour
     }
     #endregion
     // called from OSCReceiver
-/*     void MarkItem(GameObject vesselGO)
-    {
-        Debug.LogWarning("found: " + vesselGO.name);
-        vesselGO.gameObject.tag = "MARKED";
-        vesselGO.GetComponent<TargettableInfoItem>().OnClick(); // trying to open item through OnClick function
+    /*     void MarkItem(GameObject vesselGO)
+        {
+            Debug.LogWarning("found: " + vesselGO.name);
+            vesselGO.gameObject.tag = "MARKED-received";
+            vesselGO.GetComponent<TargettableInfoItem>().OnClick(); // trying to open item through OnClick function
 
-        vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetMarkedMaterial();
-      
-        AddVesselReceived(vesselGO.name);
-    } */
+            vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetMarkedMaterial();
+
+            AddVesselReceived(vesselGO.name);
+        } */
 
     public List<string> recvMarkedVessels = new List<string>();
     void AddVesselReceived(string vesselName)

@@ -168,9 +168,11 @@ public class MenuUIControl : MonoBehaviour
 
         connectionSettings.SetActive(show);
     }
-    public void WhatsMyIP()
+    public void WhatsMyIP(TextMesh whatsmyipBtnLabel)
     {
-        ipLabel.text = "Your IP is: " + LocalIPAddress() + "\n" + "Please enter this IP on the partner device.";
+        //ipLabel.text = "Your IP is: " + LocalIPAddress() + "\n" + "Please enter this IP on the partner device.";
+        whatsmyipBtnLabel.text = "Your IP:" + "\n" + LocalIPAddress();
+
     }
 
 
