@@ -6,6 +6,12 @@ public class ControllerCoordRendering : MonoBehaviour
 {
     public List<CoordinatesRenderer> renderedCoordinates = new List<CoordinatesRenderer>();
 
+    public void ResetOnCalibrate()
+    {
+        DisplayRendering(false);
+        DisplayRendering(true);
+    }
+
     public void DisplayRendering(bool state)
     {
 

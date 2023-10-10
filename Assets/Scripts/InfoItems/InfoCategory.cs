@@ -59,9 +59,9 @@ namespace Assets.InfoItems
                 infoItem.Update();
             }
 #if UNITY_EDITOR
-//this was added to keep the console clean.
+            //this was added to keep the console clean.
             if (Player.Instance.debugVesselInfoInEditor)
-            Debug.Log($"There are {infoItems.Count} InfoItems in the scene.");
+                Debug.Log($"There are {infoItems.Count} InfoItems in the scene.");
 #endif
         }
 
@@ -101,7 +101,8 @@ namespace Assets.InfoItems
             if (dataRetriever.isConnected()) dto = await this.dataRetriever.fetch();
 
             // If we could connect and data is valid, store that data
-            if (dto != null && dto.Valid) {
+            if (dto != null && dto.Valid)
+            {
                 lastDTO = dto;
                 // Process new data is that was available, otherwise process old data if that is available
                 HandleNewInfoItems(dto);
@@ -164,7 +165,7 @@ namespace Assets.InfoItems
         {
             List<InfoItem> newInfoItems = this.InfoItemInjector();
 
-            foreach(InfoItem i in newInfoItems)
+            foreach (InfoItem i in newInfoItems)
             {
                 HandleNewInfoItem(i);
             }
@@ -187,8 +188,8 @@ namespace Assets.InfoItems
                 else
                 {
                     InfoItem newInfoItem = new AISInfoItem(
-                        infoItem.GetDTO, 
-                        dataType, 
+                        infoItem.GetDTO,
+                        dataType,
                         displayArea);
                     //newInfoItem.IsTarget = infoItem.IsTarget;
                     newInfoItem.TargetNum = infoItem.TargetNum;
@@ -201,7 +202,8 @@ namespace Assets.InfoItems
 
                     AddNewInfoItem(newInfoItem);
                 }
-            } else
+            }
+            else
             {
                 if (IsInInfoItems(infoItem))
                 {

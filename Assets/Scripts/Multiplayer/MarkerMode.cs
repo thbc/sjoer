@@ -130,7 +130,7 @@ public class MarkerMode : MonoBehaviour
         vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetMarkedMaterial();
         AddVesselReceived(vesselGO.name);
     }
-    
+
     #endregion
 
     #region Interaction with unmarking items
@@ -138,19 +138,19 @@ public class MarkerMode : MonoBehaviour
     /// Triggered from interaction with InfoItem. Called if object was a sent marker.
     /// </summary>
     /// 
-public void UnmarkSentItem(GameObject vesselGO)
+    public void UnmarkSentItem(GameObject vesselGO)
     {
         Debug.LogWarning("UNMARK: " + vesselGO.name);
         vesselGO.gameObject.tag = "Untagged";
         vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetAssignedMaterial();
-        RemoveVesselReceived(vesselGO.name);
+        RemoveVesselSent(vesselGO.name);
 
         //TODO: send and notify Unmark to other player
         sender.SendUnmarked(vesselGO.name);
         //TODO2: trigger collapse --> is done already in InfoItem, but still needs to be done on-received
 
     }
-     /// <summary>
+    /// <summary>
     /// Triggered from interaction with InfoItem. Called if object was a received marker.
     /// </summary>
     /// 
@@ -158,7 +158,6 @@ public void UnmarkSentItem(GameObject vesselGO)
     {
         Debug.LogWarning("UNMARK: " + vesselGO.name);
         vesselGO.gameObject.tag = "Untagged";
-        vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetAssignedMaterial();
         RemoveVesselReceived(vesselGO.name);
 
         //TODO: send and notify Unmark to other player
@@ -213,7 +212,7 @@ public void UnmarkSentItem(GameObject vesselGO)
     {
         Debug.LogWarning("found: " + vesselGO.name);
         vesselGO.gameObject.tag = "MARKED-sent";
-        vesselGO.GetComponent<TargettableInfoItem>().OnClick(); // trying to open item through OnClick function
+        //    vesselGO.GetComponent<TargettableInfoItem>().OnClick(); // trying to open item through OnClick function
         vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetMarkedSentMaterial();
         AddVesselSent(vesselGO.name);
     }
@@ -260,7 +259,7 @@ public void UnmarkSentItem(GameObject vesselGO)
         vesselGO.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject.GetComponent<MeshRenderer>().material = GetAssignedMaterial();
         RemoveVesselReceived(vesselGO.name);
     }
-     /// <summary>
+    /// <summary>
     /// This is called when osc receives "unmarking" from other player.
     /// Only called if object was type of "received".
     /// </summary>
@@ -285,7 +284,26 @@ public void UnmarkSentItem(GameObject vesselGO)
             AddVesselReceived(vesselGO.name);
         } */
 
-    public List<string> recvMarkedVessels = new List<string>();
+    void AddVessel(List<GameObject> _vesselList, string _vesselName)
+    {
+        bool _exists = false;
+        for (int i = 0; i < _vesselList.Count; i++)
+        {
+            if (_vesselList[i].name == _vesselName)
+                _exists = true;
+        }
+        if(!_exists)
+             _vesselList[i];
+    }
+    void RemoveVessel(List<GameObject> _vesselList, string _vesselName)
+    {
+        for (int i = 0; i < _vesselList.Count; i++)
+        {
+            if (_vesselList[i].name == _vesselName)
+                _vesselList.Remove(_vesselList[i]);
+        }
+    }
+    public List<GameObject> recvMarkedVessels = new List<GameObject>();
     void AddVesselReceived(string vesselName)
     {
         if (!recvMarkedVessels.Contains(vesselName))
@@ -305,7 +323,7 @@ public void UnmarkSentItem(GameObject vesselGO)
     }
 
     // the sent marker section
-    public List<string> sentMarkedVessels = new List<string>();
+    public List<GameObject> sentMarkedVessels = new List<GameObject>();
     void AddVesselSent(string vesselName)
     {
         if (!sentMarkedVessels.Contains(vesselName))

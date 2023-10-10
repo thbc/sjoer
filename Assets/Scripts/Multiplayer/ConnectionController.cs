@@ -72,8 +72,8 @@ public class ConnectionController : MonoBehaviour
     [System.Serializable]
     public class PlayerConfig
     {
-       // public string gpsIP;
-      //  public int gpsPort = 6000;
+        // public string gpsIP;
+        //  public int gpsPort = 6000;
         public string partnerDeviceIP;
         public int inPort;
         public int outPort;
@@ -110,18 +110,18 @@ public class ConnectionController : MonoBehaviour
                         outPort = port_1;
                         break;
                 }
-                Debug.Log("Player selection value was set to: "+ _playerSelection+ " port 1 :" + port_1+ " port 2: " + port_2);
+                Debug.Log("Player selection value was set to: " + _playerSelection + " port 1 :" + port_1 + " port 2: " + port_2);
             }
         }
         public enum PlayerSelection
         {
-           Undefined, Player_1, Player_2, TestMode
+            Undefined, Player_1, Player_2, TestMode
         }
 
 
         public void DebugConfig()
         {
-            Debug.Log("Debug Config: " + "\n" + "Player Selection: "+ playerSelection.ToString() + "\n" + "Partner Device IP: "+ partnerDeviceIP + "\n" + "GPS IP: "+ Config.Instance.conf.PhoneGPS["IP"]);
+            Debug.Log("Debug Config: " + "\n" + "Player Selection: " + playerSelection.ToString() + "\n" + "Partner Device IP: " + partnerDeviceIP + "\n" + "GPS IP: " + Config.Instance.conf.PhoneGPS["IP"]);
         }
 
     }
@@ -134,25 +134,25 @@ public class ConnectionController : MonoBehaviour
         loadedPlayerConfig.partnerDeviceIP = PlayerPrefs.GetString("PartnerDeviceIP", "");
         Config.Instance.conf.PhoneGPS["IP"] = PlayerPrefs.GetString("GPSIP", "");
         int _markMode = PlayerPrefs.GetInt("MultiplayerMarkMode", 0);
-        if(_markMode == 0)
+        if (_markMode == 0)
             loadedPlayerConfig.sendMarkerMultiplayer = false;
-        if(_markMode == 1)
+        if (_markMode == 1)
             loadedPlayerConfig.sendMarkerMultiplayer = true;
-        
+
         MarkerMode.Instance.SetMarkMode(loadedPlayerConfig.sendMarkerMultiplayer);
-        
+
         //loadedPlayerConfig.gpsIP = PlayerPrefs.GetString("GPSIP", "");
-        string _storedPlayerSel = PlayerPrefs.GetString("PlayerSelection","");
+        string _storedPlayerSel = PlayerPrefs.GetString("PlayerSelection", "");
         if (_storedPlayerSel == "Player_1")
         {
             loadedPlayerConfig.playerSelection = PlayerConfig.PlayerSelection.Player_1;
-                Debug.Log("loaded player: "+ _storedPlayerSel);
-        
+            Debug.Log("loaded player: " + _storedPlayerSel);
+
         }
         else if (_storedPlayerSel == "Player_2")
         {
             loadedPlayerConfig.playerSelection = PlayerConfig.PlayerSelection.Player_2;
-            Debug.Log("loaded player: "+ _storedPlayerSel);
+            Debug.Log("loaded player: " + _storedPlayerSel);
 
         }
         else if (string.IsNullOrEmpty(_storedPlayerSel))
@@ -165,10 +165,10 @@ public class ConnectionController : MonoBehaviour
 
         loadedPlayerConfig.DebugConfig();
         if (!string.IsNullOrWhiteSpace(loadedPlayerConfig.partnerDeviceIP))// && (loadedPlayerConfig.playerSelection == PlayerConfig.PlayerSelection.Player_1 ||loadedPlayerConfig.playerSelection == PlayerConfig.PlayerSelection.Player_2))
-           {
-            Debug.Log("loaded config"); 
+        {
+            Debug.Log("loaded config");
             return loadedPlayerConfig;
-           }
+        }
         else
         {
             Debug.LogWarning("No config data found.");
@@ -192,7 +192,7 @@ public class ConnectionController : MonoBehaviour
             PlayerPrefs.SetString("PlayerSelection", _playerConfig2Store.playerSelection.ToString());
 
             PlayerPrefs.Save();
-            Debug.Log("stored player config: "+_playerConfig2Store.partnerDeviceIP +_playerConfig2Store.playerSelection.ToString());
+            Debug.Log("stored player config: " + _playerConfig2Store.partnerDeviceIP + _playerConfig2Store.playerSelection.ToString());
         }
         else
         { Debug.LogWarning("Did not store Partner device ip configuration, since partnerIP was localhost..."); }
@@ -223,13 +223,15 @@ public class ConnectionController : MonoBehaviour
             playerConfig.playerSelection = PlayerConfig.PlayerSelection.TestMode;
 
         statusLabel.text = playerConfig.playerSelection.ToString();
-        
+
+        if (playerConfig.playerSelection != PlayerConfig.PlayerSelection.TestMode)
+        {
+
             PlayerPrefs.SetString("PlayerSelection", playerConfig.playerSelection.ToString());
 
             PlayerPrefs.Save();
-
-
-        if (playerConfig.playerSelection == PlayerConfig.PlayerSelection.TestMode)
+        }
+        else if (playerConfig.playerSelection == PlayerConfig.PlayerSelection.TestMode)
         {
             TryConnect();
         }
@@ -238,13 +240,13 @@ public class ConnectionController : MonoBehaviour
 
     public void TryConnect()
     {
-            PlayerPrefs.SetString("PartnerDeviceIP", playerConfig.partnerDeviceIP);
-            PlayerPrefs.Save();
+        PlayerPrefs.SetString("PartnerDeviceIP", playerConfig.partnerDeviceIP);
+        PlayerPrefs.Save();
 
         if (osc.isInitialized || osc.isReaderRunning)
         {
             Debug.LogWarning("OSC was initialized or OSC reader running. Resetting connection");
-           ResetConnection();
+            ResetConnection();
         }
 
         if (playerConfig != null)
@@ -329,7 +331,7 @@ public class ConnectionController : MonoBehaviour
         statusLabel.text = "Successfully connected " + playerConfig.playerSelection.ToString() + " to " + playerConfig.partnerDeviceIP;
         isConnected = true;
 
-      //  StorePlayerConfig(playerConfig);
+        //  StorePlayerConfig(playerConfig);
 
     }
 

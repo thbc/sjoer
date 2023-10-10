@@ -15,6 +15,7 @@ namespace Assets.Calibration
     {
         
          #region new added, not part of original script
+         public ControllerCoordRendering controllerCoord;
         public Camera calibrationCam;
         public GameObject calibrationAligner;
       //  public GameObject pointLight;
@@ -28,6 +29,8 @@ namespace Assets.Calibration
         private Quaternion rot = Quaternion.identity;
         private Vector3 pos = Vector3.zero;
         private DateTime startTime;
+
+
         /* 
         void Start()
         {
@@ -44,6 +47,10 @@ namespace Assets.Calibration
 
         void OnEnable()
         {
+            if(controllerCoord!=null)
+                controllerCoord.ResetOnCalibrate();
+            else Debug.LogWarning("controller for coordinates not assigned. did not reset on calibrate.");
+
             calibrationCam.gameObject.SetActive(true);
             calibrationAligner.gameObject.SetActive(true);
             //pointLight.SetActive(true);

@@ -17,7 +17,7 @@ public class PlayerCoordinates : MonoBehaviour
     public Transform playerCam;
 
 
-    void Start()
+    void OnEnable()
     {
         if (usePlayerMainCam)
             playerCam = player.mainCamera.transform;

@@ -184,24 +184,29 @@ namespace Assets.InfoItems
 
 
                     }
+                    //interaction for Minimizing expanded objects 
                     else if (!GetTargetHandler().IsTarget)
                     {
+                        // we only unmark tagged objects
+                        /* if (this.gameObject.tag == "Untagged")
+                            return; */
+
                         Debug.Log("not target");
-                        // left hand interaction for  Minimizing expanded objects 
+                        // left hand interaction 
                         if (targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
                         {
                             // if the sentMarker is unmarked by the sender (sending-user)
-                            if (this.gameObject.tag == "MARKED-sent")
+                            if(IsMarked_Sent())//if (this.gameObject.tag == "MARKED-sent")
                             {
-                                // this is happenning locally on any items that were received via OSC to be marked
+                                // this is happenning locally on any items that were sent via OSC to be marked
                                 MarkerMode.Instance.UnmarkSentItem(this.gameObject);
                             }
                         }
-                        // right hand interaction for  Minimizing expanded objects 
+                        // right hand interaction
                         if (targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Right)
                         {
                             // if the receivedMarker is unmarked by the receiver (receiving-user)
-                            if (this.gameObject.tag == "MARKED-received")
+                            if (IsMarked_Received())//(this.gameObject.tag == "MARKED-received")
                             {
                                 // this is happenning locally on any items that were received via OSC to be marked
                                 MarkerMode.Instance.UnmarkReceivedItem(this.gameObject);
@@ -256,6 +261,31 @@ namespace Assets.InfoItems
 
             }
         }
+
+        enum MarkedState{ Unmarked, MarkedSent, MarkedReceived }
+        MarkedState markedState = MarkedState.Unmarked;
+        public void GetMarkedState()
+        {
+            string gTag = this.gameObject.tag;
+            switch (gTag)
+            {
+                case "MARKED-sent":
+                    markedState = MarkedState.MarkedSent;
+                    return;
+                case "MARKED-received":
+                    markedState = MarkedState.MarkedReceived;
+                    return;
+                default:
+                    markedState = MarkedState.Unmarked;
+                    return;
+            }
+        }
+        public bool IsMarked_Sent()
+        { GetMarkedState(); if (markedState == MarkedState.MarkedSent) return true; else return false; }
+        public bool IsMarked_Received()
+        { GetMarkedState(); if (markedState == MarkedState.MarkedReceived) return true; else return false; }
+        public bool IsMarked_Unmarked()
+        { GetMarkedState(); if (markedState == MarkedState.Unmarked) return true; else return false; }
 
         public TargettableInfoItem GetTargetHandler(bool forceUpdate = false)
         {
