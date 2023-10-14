@@ -41,7 +41,7 @@ namespace Multiplayer.Marking
 
 
         [HideInInspector]
-        public bool allowMarking = false;
+        public bool allowMarking = true;
 
         public OSCSender sender;
 
