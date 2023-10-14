@@ -3,6 +3,7 @@ using System.Collections.Generic;
 using Assets.Positional;
 using UnityEngine;
 using Assets.Resources;
+using Multiplayer.Marking;
 using static ConnectionController;
 
 public class MenuUIControl : MonoBehaviour
@@ -293,6 +294,7 @@ public class MenuUIControl : MonoBehaviour
             ConnectionController.Instance.playerConfig.partnerDeviceIP = _tempIP;
             ConnectionController.Instance.TryConnect();
         }
+        else Debug.LogWarning("couldnt connect since _tempIP was empty.");
     }
     //GPS IP settings
     string _tempGPSIP;

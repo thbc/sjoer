@@ -42,7 +42,7 @@ public class OSCSender : MonoBehaviour
     }
   
   
-    public void SendMarked(string _vesselName)
+    public void Send_Marked(string _vesselName)
     {
         OscMessage message = new OscMessage();
         message.address = "/marked";
@@ -53,15 +53,25 @@ public class OSCSender : MonoBehaviour
         Debug.Log("sent " + message.ToString());
     }
 
-    public void SendUnmarked(string _vesselName)
+    public void Send_UnmarkedSent(string _vesselName)
     {
         OscMessage message = new OscMessage();
-        message.address = "/unmarked";
+        message.address = "/unmarked/sent";
         message.values.Add(_vesselName);
        
         osc.Send(message);
 
-        Debug.Log("sent unmarked " + message.ToString());
+        Debug.Log("sent unmarked 'sent' " + message.ToString());
+    }
+     public void Send_UnmarkedReceived(string _vesselName)
+    {
+        OscMessage message = new OscMessage();
+        message.address = "/unmarked/received";
+        message.values.Add(_vesselName);
+       
+        osc.Send(message);
+
+        Debug.Log("sent unmarked 'recv' " + message.ToString());
     }
    
 }

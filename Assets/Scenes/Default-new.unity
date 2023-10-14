@@ -5289,7 +5289,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: ca18312e131f4b24d9e119ad3d6345f6, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  debugVesselInfoInEditor: 1
+  debugVesselInfoInEditor: 0
   mainCamera: {fileID: 1662332514}
 --- !u!1 &183833424
 GameObject:
@@ -14770,13 +14770,13 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: cb46a3d42c6c79447b083f07f78764b9, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  assignedMaterial: {fileID: 2100000, guid: 5e45dec9471a18c4fa4918270327823b, type: 2}
-  markedMaterial: {fileID: 2100000, guid: bc87ea64a5f7e78469a626a551c7fd56, type: 2}
-  markedSentMaterial: {fileID: 2100000, guid: 0027e2e27696f1e42a648e4cdfacdb82, type: 2}
+  mat_unmarked: {fileID: 2100000, guid: 5e45dec9471a18c4fa4918270327823b, type: 2}
+  mat_markedCombined: {fileID: 2100000, guid: dcc0d47a5afc0ed4eaf492111d2d3bba, type: 2}
+  mat_markedSent: {fileID: 2100000, guid: bc87ea64a5f7e78469a626a551c7fd56, type: 2}
+  mat_markedReceived: {fileID: 2100000, guid: d307b5d4719f312478ffcc1edbf3a207, type: 2}
   allowMarking: 1
   sender: {fileID: 1454610113}
-  recvMarkedVessels: []
-  sentMarkedVessels: []
+  defaultScene: {fileID: 1424894766}
 --- !u!4 &532433796
 Transform:
   m_ObjectHideFlags: 0
@@ -44671,11 +44671,11 @@ MonoBehaviour:
   connectionController: {fileID: 985589343}
   oscSender: {fileID: 1454610113}
   CoPlayerCursorHighlight: {fileID: 403171998}
-  _receivedPing: 0
-  receivedPong: 0
   playerTransform: {fileID: 0}
   aligner: {fileID: 182394185}
   playerCoordinateTransform: {fileID: 1254955550}
+  _receivedPing: 0
+  receivedPong: 0
 --- !u!4 &1408494310
 Transform:
   m_ObjectHideFlags: 0

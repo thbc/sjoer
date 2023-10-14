@@ -3,9 +3,11 @@ using Microsoft.MixedReality.OpenXR;
 using Microsoft.MixedReality.Toolkit;
 using Microsoft.MixedReality.Toolkit.Input;
 using UnityEngine;
+using UnityEngine.Timeline;
+
 // Copyright (c) Microsoft Corporation.
 // Licensed under the MIT License.
-
+// --> really?
 namespace Assets.InfoItems
 {
     public class Targettable : BaseInputHandler, IMixedRealityInputHandler
@@ -69,18 +71,27 @@ namespace Assets.InfoItems
 
         public void OnClick()
         {
-            target = !target;
-            //Debug.Log("target is now " + target);
-            if (HasLinkedInfoItem()) link.IsTarget = target;
+            target = !target; //Debug.Log("target is now " + target);
+
+            // previously: if (HasLinkedInfoItem()) link.IsTarget = target;
+            // now stop here if does not have linkedInfoItem
+            if (!HasLinkedInfoItem())
+                return;
+
+            // only execute the following if has linkedInfoItem
+            link.IsTarget = target;
 
 
-            /*    Debug.LogWarning(this.gameObject.name);
-           if(Marker.Instance.allowMarking)
-           {
-             //  this.gameObject.tag = "MARKED";
-             if(this.gameObject.name.Contains("HorizonPlane"))
-                  Marker.Instance.SendMarker(this.gameObject.name);
-           } */
+            /*
+                Debug.LogWarning(this.gameObject.name);
+                if(Marker.Instance.allowMarking)
+                {
+                //  this.gameObject.tag = "MARKED";
+                if(this.gameObject.name.Contains("HorizonPlane"))
+                    Marker.Instance.SendMarker(this.gameObject.name);
+                }
+           */
+
         }
 
         public void OnHoverStart()
@@ -94,43 +105,12 @@ namespace Assets.InfoItems
                 link.CancelInvoke();
                 link.IsHover = hover;
             }
-
-            /*     Debug.LogWarning(this.gameObject.name);
-                if(Marker.Instance.allowMarking)
-                {
-                  //  this.gameObject.tag = "MARKED";
-                  if(this.gameObject.name.Contains("HorizonPlane"))
-                       Marker.Instance.SendMarker(this.gameObject.name);
-                } */
-
-
         }
-
-        /*         public void OnNetworkMarked()
-                {
-                     Debug.Log("Network Hover start");
-
-                        OnSelect();
-                    this.gameObject.tag = "MARKED";
-
-                    this.gameObject.transform.GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetChild(0).GetComponent<MeshRenderer>().material = Marker.Instance.GetMarkedMaterial();;
-
-
-
-                } */
-
         public void OnHoverEnd()
         {
             Debug.Log("Hover end");
             // Define ms how long it takes before an infoitem disappears when looking at it
             Invoke("InnerOnHoverEnd", (float)Config.Instance.conf.DataSettings["OnLookAwayDisappearDelay"]);
-
-            /* if(this.gameObject.tag == "MARKED")
-            {
-                this.gameObject.transform.Find("default").GetComponent<MeshRenderer>().material = Marker.Instance.GetAssignedMaterial();
-                this.gameObject.tag = "Untagged";
-            }
- */
         }
 
         private void InnerOnHoverEnd()
@@ -157,6 +137,7 @@ namespace Assets.InfoItems
                 Hand = eventData.Handedness;
 
                 OnClick();
+            
             }
         }
         /* public override void OnInputDown(InputEventData eventData)
@@ -166,5 +147,16 @@ namespace Assets.InfoItems
                 OnClick();
             }
         } */
+
+       
+
+
+        /*   public bool IsMarked_Sent()
+          { GetMarkedState(); if (markedState == MarkedState.MarkedSent) return true; else return false; }
+          public bool IsMarked_Received()
+          { GetMarkedState(); if (markedState == MarkedState.MarkedReceived) return true; else return false; }
+          public bool IsMarked_Unmarked()
+          { GetMarkedState(); if (markedState == MarkedState.Unmarked) return true; else return false; }
+   */
     }
 }

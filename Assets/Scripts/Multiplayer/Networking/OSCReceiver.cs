@@ -3,7 +3,7 @@ using System.Collections.Generic;
 using TMPro;
 using UnityEngine;
 using Assets.Positional;
-
+using Multiplayer.Marking;
 public class OSCReceiver : MonoBehaviour
 {
     public OSC osc;
@@ -14,18 +14,11 @@ public class OSCReceiver : MonoBehaviour
     //public TextMeshProUGUI tempText;
 
     public GameObject CoPlayerCursorHighlight;
+    public Transform playerTransform;
 
+    public Player aligner;
 
-    public void SetupListener()
-    {
-        osc.SetAddressHandler("/ping", OnReceivePing);
-        osc.SetAddressHandler("/pong", OnReceivePong);
-
-        osc.SetAddressHandler("/cursorPos", OnReceiveCursorPos);
-        osc.SetAddressHandler("/marked", OnReceiveMark);
-        osc.SetAddressHandler("/unmarked", OnReceiveUnmark);
-
-    }
+    public Transform playerCoordinateTransform;
 
     public bool _receivedPing;
     public bool receivedPing
@@ -39,6 +32,21 @@ public class OSCReceiver : MonoBehaviour
         }
     }
     public bool receivedPong;
+    public void SetupListener()
+    {
+        osc.SetAddressHandler("/ping", OnReceivePing);
+        osc.SetAddressHandler("/pong", OnReceivePong);
+
+        osc.SetAddressHandler("/cursorPos", OnReceiveCursorPos);
+        osc.SetAddressHandler("/marked", OnReceiveMark);
+
+        osc.SetAddressHandler("/unmarked/sent", OnReceiveUnmarkSent);
+        osc.SetAddressHandler("/unmarked/received", OnReceiveUnmarkReceived);
+
+
+    }
+
+
 
     void OnReceivePing(OscMessage message)
     {
@@ -61,11 +69,7 @@ public class OSCReceiver : MonoBehaviour
     }
 
 
-    public Transform playerTransform;
 
-    public Player aligner;
-
-    public Transform playerCoordinateTransform;
     void OnReceiveCursorPos(OscMessage msg)
     {
         if (CoPlayerCursorHighlight != null)
@@ -82,21 +86,30 @@ public class OSCReceiver : MonoBehaviour
         }
     }
 
+
+    ///////////////
+    /// 
     void OnReceiveMark(OscMessage message)
     {
-        Debug.Log("received marked");
-
         string sO = message.ToString();
         string s = sO.Replace(@"/marked ", "");
-        MarkerMode.Instance.OnMarkItemReceived(s);
-    }
+        Debug.Log("received 'marked sent' for: " + s + ", triggering 'markReceived'");
 
-    void OnReceiveUnmark(OscMessage message)
+        MarkerMode.Instance.OnReceivedMark_receivedMarkers(s);
+    }
+    void OnReceiveUnmarkSent(OscMessage message)
     {
-        Debug.Log("received unmarked");
         string sO = message.ToString();
-        string s = sO.Replace(@"/unmarked ", "");
-        MarkerMode.Instance.OnUnmarkItemReceived(s);
+        string s = sO.Replace(@"/unmarked/sent ", "");
+        Debug.Log("received 'unmarked sent' for: " + s + " , triggering 'unmarkReceived'");
+        MarkerMode.Instance.OnReceivedUnmark_receivedMarkers(s);
+    }
+    void OnReceiveUnmarkReceived(OscMessage message)
+    {
+        string sO = message.ToString();
+        string s = sO.Replace(@"/unmarked/received ", "");
+        Debug.Log("received 'unmarked received' for: " + s + " , triggering 'unmarkSent'");
+        MarkerMode.Instance.OnReceivedUnmark_sentMarkers(s);
     }
 
 }

@@ -8,6 +8,10 @@ using UnityEngine;
 using Unity;
 using Assets.Positional;
 using Assets.Graphics;
+using Multiplayer.Marking;
+using Microsoft.MixedReality.Toolkit.Input;
+using Microsoft.MixedReality.OpenXR;
+using Microsoft.MixedReality.Toolkit;
 
 namespace Assets.InfoItems
 {
@@ -135,6 +139,15 @@ namespace Assets.InfoItems
             Refill();
             // Positional shape
             Reposition();
+
+            if (TargetHasChanged())
+            {
+                if (DisplayArea == DisplayArea.HorizonPlane)
+                {
+                    Debug.LogWarning(GetTargetHandler().name + "|" + this.DesiredState.ToString());
+                    OnInfoItemRetargetted();
+                }
+            }
         }
 
         protected void UpdateTargetNum()
@@ -157,62 +170,15 @@ namespace Assets.InfoItems
             {
                 if (DisplayArea == DisplayArea.HorizonPlane)
                 {
+
+
                     UpdateTargetNum();
 
-                    // dont proceed if hand info does not exist
-                    if (targetHandler == null)
-                        return;
 
-                    if (GetTargetHandler().IsTarget)
-                    {
-                        Debug.Log("is target");
+                    /* Debug.LogWarning(GetTargetHandler().name + "|" + this.DesiredState.ToString());
+                    OnInfoItemRetargetted();
+ */
 
-                        // left hand interaction for Maxmizing collapsed objects
-                        if (MarkerMode.Instance.allowMarking && targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
-                        {
-
-                            // this calls SendMarker as soon as allowMarking is true. In MarkerMode we check whether connection is established before sending it
-                            MarkerMode.Instance.SendMarker(this.dto.Key);
-                        }
-
-                        // Optional :
-                        // right hand interaction for Maxmizing collapsed objects
-                        // currently not implemented since right hand maximizing is handled locally previously in InfoItem
-                        //else if (MarkerMode.Instance.allowMarking && targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Right)
-                        //{ 
-                        //}
-
-
-                    }
-                    //interaction for Minimizing expanded objects 
-                    else if (!GetTargetHandler().IsTarget)
-                    {
-                        // we only unmark tagged objects
-                        /* if (this.gameObject.tag == "Untagged")
-                            return; */
-
-                        Debug.Log("not target");
-                        // left hand interaction 
-                        if (targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
-                        {
-                            // if the sentMarker is unmarked by the sender (sending-user)
-                            if(IsMarked_Sent())//if (this.gameObject.tag == "MARKED-sent")
-                            {
-                                // this is happenning locally on any items that were sent via OSC to be marked
-                                MarkerMode.Instance.UnmarkSentItem(this.gameObject);
-                            }
-                        }
-                        // right hand interaction
-                        if (targetHandler.Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Right)
-                        {
-                            // if the receivedMarker is unmarked by the receiver (receiving-user)
-                            if (IsMarked_Received())//(this.gameObject.tag == "MARKED-received")
-                            {
-                                // this is happenning locally on any items that were received via OSC to be marked
-                                MarkerMode.Instance.UnmarkReceivedItem(this.gameObject);
-                            }
-                        }
-                    }
                     /* if (this.meta.CurrentState == ExpandState.Target)
                     {
                         
@@ -262,31 +228,129 @@ namespace Assets.InfoItems
             }
         }
 
-        enum MarkedState{ Unmarked, MarkedSent, MarkedReceived }
-        MarkedState markedState = MarkedState.Unmarked;
-        public void GetMarkedState()
+        #region Notifications from InfoItem to its linked target handler
+
+        // Before we did this in TargettableInfoItem.OnClick()
+        // .. but we want to make sure that either clicking on Pin or SkyArea panel both trigger this..
+
+        void OnInfoItemRetargetted()
         {
-            string gTag = this.gameObject.tag;
-            switch (gTag)
+      //      Debug.LogWarning("OnInfoItemRetargetted");
+            if (this.meta.DesiredState == ExpandState.Target)// if (IsTarget)
             {
-                case "MARKED-sent":
-                    markedState = MarkedState.MarkedSent;
-                    return;
-                case "MARKED-received":
-                    markedState = MarkedState.MarkedReceived;
-                    return;
-                default:
-                    markedState = MarkedState.Unmarked;
-                    return;
+    //            Debug.LogWarning("OnInfoItemRetargetted - IsTarget");
+
+                //Debug.Log("is target");
+                //interaction for Maxmizing collapsed objects
+                if (MarkerMode.Instance.allowMarking)
+                {
+        //            Debug.LogWarning("OnInfoItemRetargetted - IsAllowMarking");
+
+                    OnMaximize();
+                }
+       //         else Debug.LogWarning("OnInfoItemRetargetted - IsNOT!!!!!AllowMarking");
+
+
+
+            }
+            //interaction for Minimizing expanded objects 
+            else if (this.meta.DesiredState == ExpandState.Collapsed)  //else if (!IsTarget)
+            {
+       //         Debug.LogWarning("OnInfoItemRetargetted - IsNotTarget");
+
+                // we only unmark tagged objects????
+                /*
+                    if (this.gameObject.tag == "Untagged")
+                        return;
+                */
+                OnMinimize();
             }
         }
-        public bool IsMarked_Sent()
-        { GetMarkedState(); if (markedState == MarkedState.MarkedSent) return true; else return false; }
-        public bool IsMarked_Received()
-        { GetMarkedState(); if (markedState == MarkedState.MarkedReceived) return true; else return false; }
-        public bool IsMarked_Unmarked()
-        { GetMarkedState(); if (markedState == MarkedState.Unmarked) return true; else return false; }
 
+        #endregion
+
+
+
+        #region MarkedState Handling
+        public MarkedStateFlag markedStateFlag = new MarkedStateFlag();
+        // proxy methods to interact with the MarkedStateFlag instance
+
+        /// <summary>
+        /// Sets the flag for Marked-Sent items. If  <param name="state"></param> is true, it will add the flag, if false it will remove it.
+        /// </summary>
+        /// <param name="state"></param>
+        public void SetState_MarkedSent(bool state)
+        {
+            if (state == true)
+                markedStateFlag.SetMarkedState(MarkedStateFlag.MarkedState.MarkedSent);
+            else
+                markedStateFlag.ClearMarkedState(MarkedStateFlag.MarkedState.MarkedSent);
+
+        }
+        public void SetState_MarkedReceived(bool state)
+        {
+            if (state == true)
+                markedStateFlag.SetMarkedState(MarkedStateFlag.MarkedState.MarkedReceived);
+            else
+                markedStateFlag.ClearMarkedState(MarkedStateFlag.MarkedState.MarkedReceived);
+        }
+
+        public bool IsMarked_Sent()
+        {
+            return markedStateFlag.IsMarkedSent();
+        }
+
+        public bool IsMarked_Received()
+        {
+            return markedStateFlag.IsMarkedReceived();
+        }
+        #endregion
+        private void OnMinimize()
+        {
+            if (GetTargetHandler().Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
+            {
+                if (IsMarked_Sent())
+                {
+
+                    //remove from List<Marked_sent>
+                    //set Material
+                    //send to client                
+                    MarkerMode.Instance.UnmarkSent(this);
+                }
+
+            }
+            else if (GetTargetHandler().Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Right)
+            {
+                if (IsMarked_Received())
+                {
+                    //remove from List<Marked_received>
+                    //set Material
+                    //send to client       
+                    MarkerMode.Instance.UnmarkReceived(this);
+                }
+            }
+        }
+
+        private void OnMaximize()
+        {
+      //      Debug.LogWarning("on max");
+            if (GetTargetHandler().Hand == Microsoft.MixedReality.Toolkit.Utilities.Handedness.Left)
+            {
+      //          Debug.LogWarning("ON MAX- left");
+
+                if (!IsMarked_Sent())
+                {
+//                    Debug.LogWarning("ON MAX- !IsMarked_Sent");
+
+                    //remove from List<Marked_sent>
+                    //set Material
+                    //send to client                
+                    MarkerMode.Instance.MarkSend(this);
+                }
+            }
+     //       else Debug.LogWarning("on max, but hand is not left");
+
+        }
         public TargettableInfoItem GetTargetHandler(bool forceUpdate = false)
         {
             // If the target changes, a new GameObject is created in ShapeProvider, which forces and update of `targetHandler`

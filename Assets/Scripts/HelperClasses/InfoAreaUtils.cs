@@ -158,23 +158,20 @@ namespace Assets.HelperClasses
             boxCollider.size = new Vector3(boxCollider.size.x, def ? 3 : boxCollider.size.y + (numInfo - 1) * boxCollider.size.y, boxCollider.size.z);
             boxCollider.center = new Vector3(boxCollider.center.x, def ? 1.5f : boxCollider.size.y / 2, boxCollider.center.z);
 
-            if (!def)
+            
+            // let s uncomment this for now and see whether it s required later..
+            /* if (!def)
             {
                 GameObject defT = target.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/default").gameObject;
                 if (defT.tag == "MARKED-sent" || defT.tag == "MARKED-received")
                     defT.GetComponent<MeshRenderer>().material = MarkerMode.Instance.GetAssignedMaterial();
-
-            }
+            } */
         }
 
         public void ToggleHelperStick(GameObject g, bool enable)
         {
             GameObject helperStick = g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/StickConnection").gameObject;
             helperStick.SetActive(enable);
-
-
-
-
 
         }
 

@@ -6,6 +6,7 @@ using System.Net;
 using System.Net.Sockets;
 using UnityEngine;
 using Assets.Resources;
+using Multiplayer.Marking;
 public class ConnectionController : MonoBehaviour
 {
     public OSC osc;
@@ -335,6 +336,12 @@ public class ConnectionController : MonoBehaviour
 
     }
 
+void OnApplicationQuit()
+{
+    osc.Close();
+    osc.enabled = false;
+    isConnected = false;
+}
 
 
 }
