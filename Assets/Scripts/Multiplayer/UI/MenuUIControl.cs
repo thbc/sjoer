@@ -5,6 +5,7 @@ using UnityEngine;
 using Assets.Resources;
 using Multiplayer.Marking;
 using static ConnectionController;
+using Assets.SceneManagement;
 
 public class MenuUIControl : MonoBehaviour
 {
@@ -43,6 +44,8 @@ public class MenuUIControl : MonoBehaviour
     public TextMesh quickConnectBtnLabel;
 
     bool hasLoadedConfig;
+
+  
 
     private void Start()
     {

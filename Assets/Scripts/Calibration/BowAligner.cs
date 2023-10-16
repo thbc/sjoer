@@ -20,7 +20,7 @@ namespace Assets.Calibration
 
         private GameObject[] dashArray;
 
-        void OnEnable() // previously Start() , now called when gameobject is activated
+        void Start()
         {
             dashArray = new GameObject[dashCount];
             dashArray[0] = dash;

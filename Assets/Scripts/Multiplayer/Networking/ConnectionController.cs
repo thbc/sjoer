@@ -26,7 +26,7 @@ public class ConnectionController : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-            DontDestroyOnLoad(gameObject);
+          //  DontDestroyOnLoad(gameObject);
         }
         else if (Instance != this)
         {

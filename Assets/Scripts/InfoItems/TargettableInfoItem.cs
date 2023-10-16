@@ -96,7 +96,7 @@ namespace Assets.InfoItems
 
         public void OnHoverStart()
         {
-            Debug.Log("Hover start");
+       //     Debug.Log("Hover start");
             hover = true;
             CancelInvoke();
 
@@ -108,7 +108,7 @@ namespace Assets.InfoItems
         }
         public void OnHoverEnd()
         {
-            Debug.Log("Hover end");
+//            Debug.Log("Hover end");
             // Define ms how long it takes before an infoitem disappears when looking at it
             Invoke("InnerOnHoverEnd", (float)Config.Instance.conf.DataSettings["OnLookAwayDisappearDelay"]);
         }

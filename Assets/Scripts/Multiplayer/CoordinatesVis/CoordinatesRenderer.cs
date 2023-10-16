@@ -27,23 +27,46 @@ public class CoordinatesRenderer : MonoBehaviour
     bool isInitialized;
 
     // --- ! keep this disabled in the scene and enable it from another script
-
+    public enum CoordinateType
+    {
+        PlayerCoordinates, MainCameraCoordinates, TrueNorthCoordinates
+    }
+    public CoordinateType coordinateType = new CoordinateType();
     private void OnEnable()
     {
-        if (!isInitialized)
+        switch (coordinateType)
         {
-            if (playerCord == null)
+            case CoordinateType.PlayerCoordinates:
+                // Handle player coordinates
+                coordinate = Player.Instance.gameObject.transform;
+
+                break;
+            case CoordinateType.MainCameraCoordinates:
+                // Handle main camera coordinates
+                coordinate = Player.Instance.mainCamera.transform;
+                break;
+            case CoordinateType.TrueNorthCoordinates:
+                // Handle true north coordinates
                 playerCord = GetComponent<PlayerCoordinates>();
 
-            if (playerCord != null)
-            {
-                if (playerCord.enabled)
+                if (playerCord != null)
                 {
-                    coordinate = this.transform;
-                    coordinate.position = playerCord.playerCam.position;
-                    coordinate.rotation = playerCord.player.Unity2TrueNorth;
-                }// else: playerCoordinates not enabled
-            } // else: is not playerCoordinates
+                    if (playerCord.enabled)
+                    {
+                        playerCord.SetupOnEnable();
+                        coordinate = this.transform;
+                        coordinate.position = playerCord.playerCam.position;
+                        coordinate.rotation = Player.Instance.Unity2TrueNorth;
+                    }// else: playerCoordinates not enabled
+                }
+                break;
+            default:
+                // Optional: handle unexpected cases
+                break;
+        }
+
+        if (!isInitialized)
+        {
 
             // Create LineRenderers
             lineRendererX = CreateLineRenderer(colorX);
@@ -67,7 +90,7 @@ public class CoordinatesRenderer : MonoBehaviour
             labelZ.gameObject.SetActive(true);
         }
 
-        
+
     }
     private void OnDisable()
     {
@@ -81,7 +104,11 @@ public class CoordinatesRenderer : MonoBehaviour
 
     void Update()
     {
-        
+        if (coordinate == null)
+        {
+            Debug.LogWarning("coordinate transform is null for " + this.gameObject.name);
+            return;
+        }
 
         // Calculate rays for each axis
         Vector3 origin = coordinate.position;
@@ -120,9 +147,9 @@ public class CoordinatesRenderer : MonoBehaviour
         lineRenderer.endWidth = lineWidth;
 
     }
-        // Helper method to create a label with a specified text and color
-        // Helper method to create a label with a specified text and color
-        private TextMesh CreateLabel(string text, Color color)
+    // Helper method to create a label with a specified text and color
+    // Helper method to create a label with a specified text and color
+    private TextMesh CreateLabel(string text, Color color)
     {
         GameObject textObj = Instantiate(LabelPrefab);
         textObj.name = text + "Label";
@@ -132,8 +159,8 @@ public class CoordinatesRenderer : MonoBehaviour
         textMesh.text = text;
         textMesh.color = color;
 
-        textObj.SetActive(true);    
-     
+        textObj.SetActive(true);
+
         return textMesh;
     }
 

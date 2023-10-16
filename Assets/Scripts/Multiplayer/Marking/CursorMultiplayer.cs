@@ -19,6 +19,8 @@ public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
 
     private void OnEnable()
     {
+        if(player == null)
+            player = Player.Instance;
         // Subscribe to input source events
         CoreServices.InputSystem?.RegisterHandler<IMixedRealitySourceStateHandler>(this);
     }

@@ -4,7 +4,7 @@ using System;
 using UnityEngine;
 using Assets.Resources;
 using Microsoft.MixedReality.Toolkit;
-
+using UnityEngine.SceneManagement;
 namespace Assets.Positional
 {
     public class Player : MonoSingleton<Player>
@@ -26,27 +26,33 @@ namespace Assets.Positional
         {
             lastGPSUpdate = (AISDTO)await gpsRetriever.fetch();
 
-            Debug.Log("Lat: " + lastGPSUpdate.Latitude + "Lon: " + lastGPSUpdate.Longitude + "Heading: " + lastGPSUpdate.Heading + "SOG: " + lastGPSUpdate.SOG);
+      //      Debug.Log("Lat: " + lastGPSUpdate.Latitude + "Lon: " + lastGPSUpdate.Longitude + "Heading: " + lastGPSUpdate.Heading + "SOG: " + lastGPSUpdate.SOG);
             if (lastGPSUpdate != null && lastGPSUpdate.Valid)
             {
-                if (DebugOnHead.Instance.gameObject.activeInHierarchy)
+                if (DebugOnHead.Instance != null)
                 {
-                    DebugOnHead.Instance.DebugTextOnHead_2("updateGPS: " +
-                "Lat: " + lastGPSUpdate.Latitude +
-                "Lon: " + lastGPSUpdate.Longitude +
-                "Heading: " + lastGPSUpdate.Heading +
-                "SOG: " + lastGPSUpdate.SOG);
-                }
-            }
-            else
-            {
-                if (DebugOnHead.Instance.gameObject.activeInHierarchy)
-                {
-                    DebugOnHead.Instance.DebugTextOnHead_2("GPS data invalid or null: " +
+                    if (DebugOnHead.Instance.gameObject.activeInHierarchy)
+                    {
+                        DebugOnHead.Instance.DebugTextOnHead_2("updateGPS: " +
                     "Lat: " + lastGPSUpdate.Latitude +
                     "Lon: " + lastGPSUpdate.Longitude +
                     "Heading: " + lastGPSUpdate.Heading +
                     "SOG: " + lastGPSUpdate.SOG);
+                    }
+                }
+            }
+            else
+            {
+                if (DebugOnHead.Instance != null)
+                {
+                    if (DebugOnHead.Instance.gameObject.activeInHierarchy)
+                    {
+                        DebugOnHead.Instance.DebugTextOnHead_2("GPS data invalid or null: " +
+                        "Lat: " + lastGPSUpdate.Latitude +
+                        "Lon: " + lastGPSUpdate.Longitude +
+                        "Heading: " + lastGPSUpdate.Heading +
+                        "SOG: " + lastGPSUpdate.SOG);
+                    }
                 }
             }
 
@@ -87,11 +93,51 @@ namespace Assets.Positional
         // Start is called before the first frame update
         void Start()
         {
+            HandleDuplicatePlayersInScene();
+
             InitializeGPSRetriever();
             /* gpsRetriever = new DataRetriever(DataConnections.PhoneGPS, DataAdapters.GPSInfo, ParameterExtractors.None, this);
             GPSTimer = new Timer(0.5f, updateGPS);
             SetLightIntensity(); */
         }
+
+        private void HandleDuplicatePlayersInScene()
+        {
+            Player[] foundPlayers = FindObjectsOfType<Player>();
+
+            // If no player or only one player is found, no need for further processing.
+            if (foundPlayers.Length <= 1) return;
+
+            GameObject gameObjToDelete = DetermineDuplicatePlayer(foundPlayers);
+
+            if (gameObjToDelete != null)
+            {
+                Destroy(gameObjToDelete);
+                Debug.Log("Destroyed duplicate player object in the initial scene.");
+            }
+        }
+
+        private GameObject DetermineDuplicatePlayer(Player[] players)
+        {
+            GameObject gameObjToDelete = null;
+
+            foreach (Player player in players)
+            {
+                Scene playerScene = player.gameObject.scene;
+
+                Debug.LogFormat("{0} in scene: {1}", player.gameObject.name, playerScene.name);
+
+                // Assuming '0' is the build index of your initial scene. Consider using scene name for clarity.
+                if (playerScene.buildIndex == 0)
+                {
+                    Debug.LogFormat("Marked for deletion: {0} in scene: {1}", player.gameObject.name, playerScene.name);
+                    gameObjToDelete = player.gameObject;
+                }
+            }
+
+            return gameObjToDelete;
+        }
+
         public void InitializeGPSRetriever()
         {
             gpsRetriever = new DataRetriever(DataConnections.PhoneGPS, DataAdapters.GPSInfo, ParameterExtractors.None, this);
@@ -209,21 +255,22 @@ namespace Assets.Positional
 
         #region new added, not part of original script
         Camera calibrationCam;
-        public void PrepareCalibration(Camera _calibCam)
-        {
-            calibrationCam = _calibCam;
-            mainCamera = calibrationCam;
-            SetLightIntensity();
-        }
-        public void FinishCalibration()
-        {
-            mainCamera = null;
-            this.EnsureMainCamera();
-        }
-       
+        /*  public void PrepareCalibration(Camera _calibCam)
+         {
+             calibrationCam = _calibCam;
+             mainCamera = calibrationCam;
+             SetLightIntensity();
+         }
+         public void FinishCalibration()
+         {
+             mainCamera = null;
+             this.EnsureMainCamera();
+         } */
+
+
         #endregion
         public void calibrate()
-        {            
+        {
             this.unitytoTrueNorth(true);
         }
         private void unitytoTrueNorth(bool calibrate = false)
@@ -240,7 +287,7 @@ namespace Assets.Positional
 
             unityToTrueNorthRotation = Quaternion.Euler(0, -(CalibrationDiff + UpdateDiff), 0);
 
-            Debug.Log("Unity to true north: " + unityToTrueNorthRotation);
+//            Debug.Log("Unity to true north: " + unityToTrueNorthRotation);
 
         }
     }

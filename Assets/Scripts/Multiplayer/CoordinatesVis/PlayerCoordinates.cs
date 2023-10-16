@@ -8,19 +8,19 @@ using Assets.Positional;
  */
 public class PlayerCoordinates : MonoBehaviour
 {
-    public Player player;
+  //  public Player player;
     float initialY;
     [Tooltip("If true, the player's main camera replaces the assigned Transform playerCam.")]
-    public bool usePlayerMainCam;
+    public bool usePlayerMainCam = true;
 
     [Tooltip("The transform position of the coordinate system. This can either be static or moving along with the player, like its main Camera. Will only be used if usePlayerMainCam is false..")]
     public Transform playerCam;
 
 
-    void OnEnable()
+    public void SetupOnEnable()
     {
         if (usePlayerMainCam)
-            playerCam = player.mainCamera.transform;
+            playerCam = Player.Instance.mainCamera.transform;
 
 
         initialY = this.transform.position.y;
@@ -28,8 +28,11 @@ public class PlayerCoordinates : MonoBehaviour
 
     void Update()
     {
+        if(playerCam == null)
+        return;
+
         transform.position = new Vector3(playerCam.position.x, initialY, playerCam.position.z);
-        transform.rotation = player.Unity2TrueNorth;
+        transform.rotation = Player.Instance.Unity2TrueNorth;
     }
 
 }

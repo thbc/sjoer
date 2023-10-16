@@ -33,7 +33,7 @@ namespace Assets.HelperClasses
 
         public void Awake()
         {
-            m_Instance = Instance;
+                m_Instance = Instance;
         }
 
         /// <summary>
@@ -67,10 +67,13 @@ namespace Assets.HelperClasses
 
                             // Make instance persistent.
                             DontDestroyOnLoad(singletonObject);
-                        } else { 
+                        }
+                        else
+                        {
                             DontDestroyOnLoad(m_Instance);
                         }
                     }
+                    
 
                     return m_Instance;
                 }

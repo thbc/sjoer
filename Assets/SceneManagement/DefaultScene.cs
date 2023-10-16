@@ -25,6 +25,11 @@ namespace Assets.SceneManagement
         
         void Start()
         {
+            //new addition:
+            if(player == null)
+                player = Player.Instance.gameObject;
+
+
             lastUpdate = DateTime.Now;
             Player aligner = player.GetComponent<Player>();
             GraphicFactory.Instance.aligner ??= aligner;
