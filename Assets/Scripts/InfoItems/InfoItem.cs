@@ -144,7 +144,6 @@ namespace Assets.InfoItems
             {
                 if (DisplayArea == DisplayArea.HorizonPlane)
                 {
-                    Debug.LogWarning(GetTargetHandler().name + "|" + this.DesiredState.ToString());
                     OnInfoItemRetargetted();
                 }
             }
@@ -238,6 +237,8 @@ namespace Assets.InfoItems
       //      Debug.LogWarning("OnInfoItemRetargetted");
             if (this.meta.DesiredState == ExpandState.Target)// if (IsTarget)
             {
+            Debug.LogWarning(GetTargetHandler().name + "|" + this.DesiredState.ToString());
+
     //            Debug.LogWarning("OnInfoItemRetargetted - IsTarget");
 
                 //Debug.Log("is target");
@@ -256,6 +257,8 @@ namespace Assets.InfoItems
             //interaction for Minimizing expanded objects 
             else if (this.meta.DesiredState == ExpandState.Collapsed)  //else if (!IsTarget)
             {
+                Debug.LogWarning(GetTargetHandler().name + "|" + this.DesiredState.ToString());
+
        //         Debug.LogWarning("OnInfoItemRetargetted - IsNotTarget");
 
                 // we only unmark tagged objects????
