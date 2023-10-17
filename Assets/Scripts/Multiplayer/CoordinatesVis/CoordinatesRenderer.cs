@@ -43,7 +43,8 @@ public class CoordinatesRenderer : MonoBehaviour
                 break;
             case CoordinateType.MainCameraCoordinates:
                 // Handle main camera coordinates
-                coordinate = Player.Instance.mainCamera.transform;
+                 Player.Instance.EnsureMainCamera();
+                coordinate =Player.Instance.mainCamera.transform;
                 break;
             case CoordinateType.TrueNorthCoordinates:
                 // Handle true north coordinates
