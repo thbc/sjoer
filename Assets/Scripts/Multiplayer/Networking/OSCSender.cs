@@ -8,6 +8,14 @@ public class OSCSender : MonoBehaviour
 
     public bool sentPing;
     public bool sentPong;
+
+    
+    void OnEnable()
+    {
+        ConnectionController.Instance.oscSender = this;
+        osc = ConnectionController.Instance.osc;
+        
+    }
     public void SendPing()
     {
     

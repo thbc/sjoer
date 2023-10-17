@@ -422,7 +422,7 @@ public class OSC : MonoBehaviour
 
     byte[] buffer;
 
-    bool paused = false;
+    public bool paused = false;
 
 
 #if UNITY_EDITOR
@@ -671,6 +671,11 @@ public class OSC : MonoBehaviour
     }
     public void Send(OscMessage oscMessage)
     {
+        if(paused)
+        {
+            Debug.LogWarning("Paused OSC, not sending  messages");
+        return;
+        }
         if (isInitialized) // added to avoid null reference when osc is not initialized yet
         {
             byte[] packet = new byte[1000];
@@ -688,6 +693,11 @@ public class OSC : MonoBehaviour
     /// <param name="oms">The OSC Message to send.</param>   
     public void Send(ArrayList oms)
     {
+        if(paused)
+        {
+            Debug.LogWarning("Paused OSC, not sending  messages");
+        return;
+        }
         if (isInitialized) // added to avoid null reference when osc is not initialized yet
         {
             byte[] packet = new byte[1000];

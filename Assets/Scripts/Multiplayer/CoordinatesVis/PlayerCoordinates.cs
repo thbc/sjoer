@@ -8,7 +8,7 @@ using Assets.Positional;
  */
 public class PlayerCoordinates : MonoBehaviour
 {
-  //  public Player player;
+    //  public Player player;
     float initialY;
     [Tooltip("If true, the player's main camera replaces the assigned Transform playerCam.")]
     public bool usePlayerMainCam = true;
@@ -16,20 +16,32 @@ public class PlayerCoordinates : MonoBehaviour
     [Tooltip("The transform position of the coordinate system. This can either be static or moving along with the player, like its main Camera. Will only be used if usePlayerMainCam is false..")]
     public Transform playerCam;
 
+    void Start()
+    {
+        SetupOnEnable();
+        initialY = this.transform.position.y;
+
+    }
 
     public void SetupOnEnable()
     {
         if (usePlayerMainCam)
+        {
+            Player.Instance.EnsureMainCamera();
             playerCam = Player.Instance.mainCamera.transform;
+        }
 
 
-        initialY = this.transform.position.y;
+       // initialY = this.transform.position.y;
     }
 
     void Update()
     {
-        if(playerCam == null)
-        return;
+        if (playerCam == null)
+        {
+            Debug.LogWarning("couldnt upload player coordinates since playerCam is null");
+            return;
+        }
 
         transform.position = new Vector3(playerCam.position.x, initialY, playerCam.position.z);
         transform.rotation = Player.Instance.Unity2TrueNorth;

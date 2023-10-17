@@ -22,13 +22,11 @@ namespace Assets.SceneManagement
         private DateTime lastUpdate;
 
         private List<InfoItem> pinList = new List<InfoItem>(); // =horizonList
-        
+
+       
         void Start()
         {
-            //new addition:
-            if(player == null)
-                player = Player.Instance.gameObject;
-
+              player = Player.Instance.gameObject;
 
             lastUpdate = DateTime.Now;
             Player aligner = player.GetComponent<Player>();
@@ -80,7 +78,7 @@ namespace Assets.SceneManagement
             {
                 allInfoItems[infoCategory.Name] = infoCategory.Update();
                 GraphicFactory.Instance.GetPostProcessor(infoCategory.DataType, infoCategory.DisplayArea).PostProcess(allInfoItems[infoCategory.Name]);
-                if(infoCategory.Name == "AISHorizon")
+                if (infoCategory.Name == "AISHorizon")
                     pinList = allInfoItems[infoCategory.Name];
             }
             /* } */
@@ -98,7 +96,15 @@ namespace Assets.SceneManagement
 
         void OnEnable()
         {
+            //new addition:
+            /* if (player == null)
+            {
+                SingletonReferenceEnforcer.Instance.HandleDuplicatePlayerInScene();
+                player = SingletonReferenceEnforcer.Instance.original_Player.gameObject;
+            } */
             SceneManager.activeSceneChanged += OnSceneLoaded;
+            
+            
         }
 
         void OnSceneLoaded(Scene o, Scene i)
@@ -134,7 +140,7 @@ namespace Assets.SceneManagement
 
         }
 
-   
+
         InfoItem GetSpecificItemFromPinList(string _key)
         {
             var _info = pinList.Find(x => x.Key == _key);
@@ -186,38 +192,38 @@ namespace Assets.SceneManagement
 
 
     }
-/* 
-    List<InfoItem> GetAllItemsMarkedAsReceived()
-    {
-        List<InfoItem> markedReceivedItems = new List<InfoItem>();
-        var L = GetAllItemsFromAISHorizon();
-
-        foreach (var infoItem in L)
+    /* 
+        List<InfoItem> GetAllItemsMarkedAsReceived()
         {
-            if (infoItem.markedStateFlag.IsMarkedReceived())
+            List<InfoItem> markedReceivedItems = new List<InfoItem>();
+            var L = GetAllItemsFromAISHorizon();
+
+            foreach (var infoItem in L)
             {
-                markedReceivedItems.Add(infoItem);
+                if (infoItem.markedStateFlag.IsMarkedReceived())
+                {
+                    markedReceivedItems.Add(infoItem);
+                }
             }
-        }
 
-        
 
-        return markedReceivedItems;
-    } */
-/*     List<InfoItem> GetAllItemsMarkedAsSent()
-    {
-        List<InfoItem> markedSentItems = new List<InfoItem>();
-        var L = GetAllItemsFromAISHorizon();
 
-        foreach (var infoItem in L)
+            return markedReceivedItems;
+        } */
+    /*     List<InfoItem> GetAllItemsMarkedAsSent()
         {
-            if (infoItem.markedStateFlag.IsMarkedSent())
+            List<InfoItem> markedSentItems = new List<InfoItem>();
+            var L = GetAllItemsFromAISHorizon();
+
+            foreach (var infoItem in L)
             {
-                markedSentItems.Add(infoItem);
+                if (infoItem.markedStateFlag.IsMarkedSent())
+                {
+                    markedSentItems.Add(infoItem);
+                }
             }
+            return markedSentItems;
         }
-        return markedSentItems;
-    }
- */
+     */
 
 }

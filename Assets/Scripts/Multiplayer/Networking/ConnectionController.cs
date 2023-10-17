@@ -7,6 +7,7 @@ using System.Net.Sockets;
 using UnityEngine;
 using Assets.Resources;
 using Multiplayer.Marking;
+using UnityEngine.SceneManagement;
 public class ConnectionController : MonoBehaviour
 {
     public OSC osc;
@@ -26,7 +27,7 @@ public class ConnectionController : MonoBehaviour
         if (Instance == null)
         {
             Instance = this;
-          //  DontDestroyOnLoad(gameObject);
+            DontDestroyOnLoad(gameObject);
         }
         else if (Instance != this)
         {
@@ -35,7 +36,30 @@ public class ConnectionController : MonoBehaviour
         }
 
     }
-
+    void OnEnable()
+    {
+        SceneManager.sceneLoaded += OnMainSceneLoaded;
+    }
+    void OnDisable()
+    {
+        SceneManager.sceneLoaded -= OnMainSceneLoaded;
+    }
+    bool hasCalibrated=false;
+    void OnMainSceneLoaded(Scene scene, LoadSceneMode mode)
+    {
+        if(scene.buildIndex == 0)
+        {
+            Debug.Log("Loaded default scene [which is expected to be buildIndex 0..]");
+            if(hasCalibrated)
+                ResumeConnection_AfterCalibration();
+        }
+        else if(scene.buildIndex == 1)
+        {
+            PauseConnection_OnCalibration();
+            hasCalibrated = true;
+            Debug.Log("Loaded calibration scene [which is expected to be buildIndex 1..]");
+        }
+    }
 
     public static bool IsValidIP(string ipString)
     {
@@ -297,7 +321,24 @@ public class ConnectionController : MonoBehaviour
 
     }
 
-
+    // pause and unpause connection during calibration (?)
+    void PauseConnection_OnCalibration()
+    {
+        osc.paused = true;
+    }
+    void ResumeConnection_AfterCalibration()
+    {
+        osc.paused = false;
+        if(osc.isInitialized)
+        {
+            oscReceiver.SetupListener();
+            oscSender.sentPing = true;
+            oscSender.sentPong = true;
+            oscReceiver.receivedPing = true;
+            oscReceiver.receivedPong = true;
+            oscReceiver.CoPlayerCursorHighlight.SetActive(true);
+        }
+    }
 
 
     void ResetConnection()//Reconnect()
@@ -336,12 +377,12 @@ public class ConnectionController : MonoBehaviour
 
     }
 
-void OnApplicationQuit()
-{
-    osc.Close();
-    osc.enabled = false;
-    isConnected = false;
-}
+    void OnApplicationQuit()
+    {
+        osc.Close();
+        osc.enabled = false;
+        isConnected = false;
+    }
 
 
 }

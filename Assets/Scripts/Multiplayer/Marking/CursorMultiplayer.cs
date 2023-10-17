@@ -19,10 +19,22 @@ public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
 
     private void OnEnable()
     {
-        if(player == null)
-            player = Player.Instance;
+        sender = ConnectionController.Instance.oscSender;
+        /* if(player == null)
+            player = Player.Instance; */
+             //new addition:
+            
         // Subscribe to input source events
         CoreServices.InputSystem?.RegisterHandler<IMixedRealitySourceStateHandler>(this);
+    }
+    void Start()
+    {
+        /* if(player == null)
+            {
+                SingletonReferenceEnforcer.Instance.HandleDuplicatePlayerInScene();
+                player = SingletonReferenceEnforcer.Instance.original_Player;
+            } */
+
     }
 
     public void OnSourceDetected(SourceStateEventData eventData)
@@ -48,7 +60,7 @@ public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
 
    // public Transform playerTransform;
 
-    public Player player;
+    //public Player player;
 
 
     public Transform playerCoordinatesTransform;
@@ -93,6 +105,8 @@ public class CursorMultiplayer : MonoBehaviour, IMixedRealitySourceStateHandler
             else
                 {
                     Debug.LogWarning("sender not defined");
+                    if(sender == null && ConnectionController.Instance.oscSender != null )
+                        sender = ConnectionController.Instance.oscSender;
                 }            
         }
     }

@@ -11,9 +11,6 @@ EditorBuildSettings:
   - enabled: 1
     path: Assets/Scenes/Calibration.unity
     guid: d4d30d0067607e643939b00faebd1a6f
-  - enabled: 0
-    path: Assets/Scenes/other/Default-old.unity
-    guid: 0edf0dba8defa464d84200325b87256c
   m_configObjects:
     Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 38c30238ae9806e4eab5e3f5a9c7a690, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 6b8259128faa40c4a877ea084109c17b, type: 2}

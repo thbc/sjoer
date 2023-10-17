@@ -14,46 +14,12 @@ namespace Assets.SceneManagement
     {
         // TODO: Write loop here, that loops when not calibrating.
         private bool looping = true;
-        void Start()
+        void OnEnable()
         {
-            HandleDuplicateSceneManagerInScene();
+          // SingletonReferenceEnforcer.Instance.HandleDuplicateSceneManagerInScene();
         }
 
-        private void HandleDuplicateSceneManagerInScene()
-        {
-            MySceneManager[] foundSceneManagers = FindObjectsOfType<MySceneManager>();
-
-            // If no sceneManager or only one sceneManager is found, no need for further processing.
-            if (foundSceneManagers.Length <= 1) return;
-
-            GameObject gameObjToDelete = DetermineDuplicateSceneManager(foundSceneManagers);
-
-            if (gameObjToDelete != null)
-            {
-                Destroy(gameObjToDelete);
-                Debug.Log("Destroyed duplicate scenemanager object in the initial scene.");
-            }
-        }
-
-        private GameObject DetermineDuplicateSceneManager(MySceneManager[] foundSceneManagers)
-        {
-            GameObject gameObjToDelete = null;
-
-            foreach (MySceneManager sceneManager in foundSceneManagers)
-            {
-                Scene playerScene = sceneManager.gameObject.scene;
-
-                Debug.LogFormat("{0} in scene: {1}", sceneManager.gameObject.name, playerScene.name);
-
-                if (playerScene.buildIndex == 0)
-                {
-                    Debug.LogFormat("Marked for deletion: {0} in scene: {1}", sceneManager.gameObject.name, playerScene.name);
-                    gameObjToDelete = sceneManager.gameObject;
-                }
-            }
-
-            return gameObjToDelete;
-        }
+       
 
         void Update()
         {

@@ -26,7 +26,7 @@ namespace Assets.Positional
         {
             lastGPSUpdate = (AISDTO)await gpsRetriever.fetch();
 
-      //      Debug.Log("Lat: " + lastGPSUpdate.Latitude + "Lon: " + lastGPSUpdate.Longitude + "Heading: " + lastGPSUpdate.Heading + "SOG: " + lastGPSUpdate.SOG);
+            //      Debug.Log("Lat: " + lastGPSUpdate.Latitude + "Lon: " + lastGPSUpdate.Longitude + "Heading: " + lastGPSUpdate.Heading + "SOG: " + lastGPSUpdate.SOG);
             if (lastGPSUpdate != null && lastGPSUpdate.Valid)
             {
                 if (DebugOnHead.Instance != null)
@@ -91,9 +91,13 @@ namespace Assets.Positional
         }
 
         // Start is called before the first frame update
+        void OnEnable()
+        {
+            //SingletonReferenceEnforcer.Instance.HandleDuplicatePlayerInScene();
+
+        }
         void Start()
         {
-            HandleDuplicatePlayersInScene();
 
             InitializeGPSRetriever();
             /* gpsRetriever = new DataRetriever(DataConnections.PhoneGPS, DataAdapters.GPSInfo, ParameterExtractors.None, this);
@@ -101,21 +105,7 @@ namespace Assets.Positional
             SetLightIntensity(); */
         }
 
-        private void HandleDuplicatePlayersInScene()
-        {
-            Player[] foundPlayers = FindObjectsOfType<Player>();
 
-            // If no player or only one player is found, no need for further processing.
-            if (foundPlayers.Length <= 1) return;
-
-            GameObject gameObjToDelete = DetermineDuplicatePlayer(foundPlayers);
-
-            if (gameObjToDelete != null)
-            {
-                Destroy(gameObjToDelete);
-                Debug.Log("Destroyed duplicate player object in the initial scene.");
-            }
-        }
 
         private GameObject DetermineDuplicatePlayer(Player[] players)
         {
@@ -191,7 +181,14 @@ namespace Assets.Positional
 
         private void OnDestroy()
         {
-            gpsRetriever.OnDestroy();
+            //previously:
+            // gpsRetriever.OnDestroy();
+
+            // now since we added Singleton destruction on Awake to avoid duplicates:
+            if (gpsRetriever != null)
+            {
+                gpsRetriever.OnDestroy();
+            }
         }
 
         public Vector3 GetWorldTransform(double lat, double lon)
@@ -287,7 +284,7 @@ namespace Assets.Positional
 
             unityToTrueNorthRotation = Quaternion.Euler(0, -(CalibrationDiff + UpdateDiff), 0);
 
-//            Debug.Log("Unity to true north: " + unityToTrueNorthRotation);
+            //            Debug.Log("Unity to true north: " + unityToTrueNorthRotation);
 
         }
     }

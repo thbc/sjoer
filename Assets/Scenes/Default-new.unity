@@ -4215,8 +4215,8 @@ MonoBehaviour:
       m_PersistentCalls:
         m_Calls:
         - m_Target: {fileID: 1763816682}
-          m_TargetAssemblyTypeName: FindMySceneManager, Assembly-CSharp
-          m_MethodName: ExecuteStartCalibration
+          m_TargetAssemblyTypeName: SingletonReferenceEnforcer, Assembly-CSharp
+          m_MethodName: Execute_SceneManager_StartCalibration
           m_Mode: 1
           m_Arguments:
             m_ObjectArgument: {fileID: 0}
@@ -30321,6 +30321,7 @@ MonoBehaviour:
   m_Script: {fileID: 11500000, guid: b6f6b37ed949e544b88b7cf3a7853ca2, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  paused: 0
   connectionController: {fileID: 985589343}
   isInitialized: 0
   inPort: 0
@@ -44701,11 +44702,8 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   osc: {fileID: 985589341}
-  connectionController: {fileID: 985589343}
   oscSender: {fileID: 1454610113}
   CoPlayerCursorHighlight: {fileID: 403171998}
-  playerTransform: {fileID: 0}
-  aligner: {fileID: 182394185}
   playerCoordinateTransform: {fileID: 1254955550}
   _receivedPing: 0
   receivedPong: 0
@@ -46645,7 +46643,6 @@ MonoBehaviour:
   m_Name: 
   m_EditorClassIdentifier: 
   sender: {fileID: 1454610113}
-  player: {fileID: 182394185}
   playerCoordinatesTransform: {fileID: 1254955550}
 --- !u!4 &1454610112
 Transform:
@@ -54858,7 +54855,7 @@ GameObject:
   - component: {fileID: 1763816683}
   - component: {fileID: 1763816682}
   m_Layer: 0
-  m_Name: FindMySceneManager
+  m_Name: SingletonReferenceEnforcer
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -54873,9 +54870,12 @@ MonoBehaviour:
   m_GameObject: {fileID: 1763816681}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 18af98746eb98a140b5eba40f76d2395, type: 3}
+  m_Script: {fileID: 11500000, guid: b6a614955681225458df58155a0165f4, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
+  cursorMP: {fileID: 1454610111}
+  statusLabel: {fileID: 1089610158}
+  statusLabel_2: {fileID: 1042323272}
 --- !u!4 &1763816683
 Transform:
   m_ObjectHideFlags: 0

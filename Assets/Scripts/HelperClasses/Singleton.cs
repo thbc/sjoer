@@ -31,15 +31,61 @@ namespace Assets.HelperClasses
         private static object m_Lock = new object();
         private static T m_Instance;
 
-        public void Awake()
+        //previously:
+        /*  public void Awake()
+         {
+                 m_Instance = Instance;
+         }
+  */
+        private void Awake()
         {
-                m_Instance = Instance;
+            if (m_Instance != null && m_Instance != this)
+            {
+                Destroy(this.gameObject);
+                return;
+            }
+
+            m_Instance = this as T;
+            DontDestroyOnLoad(this.gameObject);
         }
 
         /// <summary>
         /// Access singleton instance through this propriety.
-        /// </summary>
+        /// </summarbyb>
         public static T Instance
+        {
+            get
+            {
+                if (m_ShuttingDown)
+                {
+                    Debug.LogWarning("[Singleton] Instance '" + typeof(T) +
+                        "' already destroyed. Returning null.");
+                    return null;
+                }
+
+                lock (m_Lock)
+                {
+                    if (m_Instance == null)
+                    {
+                        // Search for existing instance.
+                        m_Instance = (T)FindObjectOfType(typeof(T));
+
+                        // If no existing instance, create one.
+                        if (m_Instance == null)
+                        {
+                            var singletonObject = new GameObject();
+                            m_Instance = singletonObject.AddComponent<T>();
+                            singletonObject.name = typeof(T).ToString() + " (Singleton)";
+                            DontDestroyOnLoad(singletonObject);
+                        }
+                    }
+
+                    return m_Instance;
+                }
+            }
+        }
+        //previously:
+        /* public static T Instance
         {
             get
             {
@@ -73,12 +119,12 @@ namespace Assets.HelperClasses
                             DontDestroyOnLoad(m_Instance);
                         }
                     }
-                    
+
 
                     return m_Instance;
                 }
             }
-        }
+        } */
 
 
         private void OnApplicationQuit()
