@@ -109,6 +109,7 @@ public class ConnectionController : MonoBehaviour
         public bool sendMarkerMultiplayer;
 
         private PlayerSelection _playerSelection;
+
         public PlayerSelection playerSelection
         {
             get
@@ -153,6 +154,7 @@ public class ConnectionController : MonoBehaviour
     public PlayerConfig playerConfig = new PlayerConfig();
 
 
+    // this is instantiated in Start() from MenuUIControl
     public PlayerConfig LoadPlayerConfig()
     {
         PlayerConfig loadedPlayerConfig = new PlayerConfig();

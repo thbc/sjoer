@@ -6,6 +6,7 @@ using Assets.Resources;
 using Multiplayer.Marking;
 using static ConnectionController;
 using Assets.SceneManagement;
+using Microsoft.MixedReality.Toolkit.Experimental.UI;
 
 public class MenuUIControl : MonoBehaviour
 {
@@ -43,9 +44,113 @@ public class MenuUIControl : MonoBehaviour
 
     public TextMesh quickConnectBtnLabel;
 
+
     bool hasLoadedConfig;
 
-  
+    //--vessel mode
+    public GameObject vesselSettingsMenu;
+
+    public TextMesh loadedVesselModeConfigBtnLabel;
+    public TextMesh domesticVesselNameConfigLabel;
+    public TextMesh bridgeHeighConfigLabel;
+
+
+
+    string _tempVesselName;
+    double _tempBridgeHeight;
+
+    public TouchScreenKeyboard keyboard;
+    public void ChangeVesselName()
+    {
+        ShowKeyboard(true);
+        StartCoroutine(MonitorKeyboardInput(true));
+    }
+ public void ChangeBridgHeight()
+    {
+        ShowKeyboard(false);
+        StartCoroutine(MonitorKeyboardInput(false));
+    }
+    void ShowKeyboard(bool forname)
+    {
+        if (forname)
+            keyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default, false, false, false, false);
+        else
+            keyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.NumbersAndPunctuation, false, false, false, false);
+
+    }
+
+
+    IEnumerator MonitorKeyboardInput(bool forname)
+    {
+        // Wait while the keyboard is active
+        while (keyboard != null && keyboard.status != TouchScreenKeyboard.Status.Done)
+        {
+            if (keyboard.status == TouchScreenKeyboard.Status.Visible)
+            {
+                if (forname)
+                    domesticVesselNameConfigLabel.text = keyboard.text;
+                else
+                    bridgeHeighConfigLabel.text = keyboard.text;
+            }
+            yield return null; // Wait for the next frame and then continue the loop
+        }
+
+        // Optional: If you want to capture the final text after the keyboard is done
+        if (keyboard != null)
+        {
+            if (forname)
+            {
+                _tempVesselName = keyboard.text;
+                StoreVesselName();
+            }
+            else
+            {
+                if (double.TryParse(keyboard.text, out _tempBridgeHeight))
+                {
+                    Config.Instance.conf.VesselSettingsD["BridgeHeight"] = _tempBridgeHeight;
+                    StoreBridgeHeight();
+                }
+            }
+        }
+    }
+    void StoreVesselName()
+    {
+        Config.Instance.conf.VesselSettingsS["VesselName"] = _tempVesselName;
+        PlayerPrefs.SetString("DomesticVesselName", _tempVesselName);
+        PlayerPrefs.Save();
+        domesticVesselNameConfigLabel.text = keyboard.text;
+
+    }
+    void StoreBridgeHeight()
+    {
+        Config.Instance.conf.VesselSettingsD["BridgeHeight"] = _tempBridgeHeight;
+        PlayerPrefs.SetString("BridgeHeight", _tempBridgeHeight.ToString());
+        PlayerPrefs.Save();
+        bridgeHeighConfigLabel.text = keyboard.text;
+
+    }
+    public void SetVesselMode()
+    {
+        bool _state = !Config.Instance.conf.VesselMode;
+
+        Config.Instance.conf.VesselMode = _state;
+        if (_state)
+        {
+            PlayerPrefs.SetInt("IsVesselMode", 0);
+            loadedVesselModeConfigBtnLabel.text = "You are not on a Vessel";
+
+        }
+        else if (!_state)
+        {
+            PlayerPrefs.SetInt("IsVesselMode", 1);
+            loadedVesselModeConfigBtnLabel.text = "You are on Vessel: ";
+        }
+        PlayerPrefs.Save();
+    }
+
+
+
+
 
     private void Start()
     {
@@ -56,12 +161,30 @@ public class MenuUIControl : MonoBehaviour
             loadedIPConfigBtnLabel.text = ConnectionController.Instance.playerConfig.partnerDeviceIP;
             loadedGPSIPConfigBtnLabel.text = Config.Instance.conf.PhoneGPS["IP"];
 
-            if(ConnectionController.Instance.playerConfig.playerSelection != PlayerConfig.PlayerSelection.Undefined)
+            int _VesselMode = PlayerPrefs.GetInt("IsVesselMode", 0); // by default is not vessel mode --> 0
+            bool _isVesselMode = false;
+            if (_VesselMode == 0)
+                loadedVesselModeConfigBtnLabel.text = "You are not on a Vessel";
+            if (_VesselMode == 1)
+            {
+                _isVesselMode = true;
+                loadedVesselModeConfigBtnLabel.text = "You are on Vessel: ";
+            }
+
+            if (double.TryParse(PlayerPrefs.GetString("BridgeHeight", ""), out _tempBridgeHeight))
+            {
+                Config.Instance.conf.VesselSettingsD["BridgeHeight"] = _tempBridgeHeight;
+            }
+            domesticVesselNameConfigLabel.text = _tempVesselName;
+            Config.Instance.conf.VesselSettingsS["VesselName"] = _tempVesselName;
+            Config.Instance.conf.VesselMode = _isVesselMode;
+
+            if (ConnectionController.Instance.playerConfig.playerSelection != PlayerConfig.PlayerSelection.Undefined)
             {
                 DisplayConnectionSettings(true);
                 DisplayQuickConnectionMenu(true);
             }
-            else 
+            else
             {
                 // this is executed when the config is not null, but the playerselection is still undefined
                 DisplayConnectionSettings(true);
@@ -95,9 +218,10 @@ public class MenuUIControl : MonoBehaviour
         debugMenu.SetActive(false);
         gpsSettings.SetActive(false);
         connectionSettings.SetActive(false);
+        vesselSettingsMenu.SetActive(false);
     }
     // all sub menu inside connectionSettings
-     void HideConnectionSettingsMenus()
+    void HideConnectionSettingsMenus()
     {
         quickConnectMenu.SetActive(false);
         playerSelectionMenu.SetActive(false);
@@ -119,6 +243,18 @@ public class MenuUIControl : MonoBehaviour
 
         generalMenu.SetActive(show);
     }
+    //-- new vessel settings
+    public void DisplayVesselSettingsMenu(bool show)
+    {
+        if (show)
+        {
+            HideMenus();
+        }
+
+        vesselSettingsMenu.SetActive(show);
+    }
+    //___
+
     public void DisplayGPSSettings(bool show)
     {
         if (show)
@@ -336,7 +472,7 @@ public class MenuUIControl : MonoBehaviour
             Config.Instance.conf.PhoneGPS["IP"] = _tempGPSIP;
             PlayerPrefs.SetString("GPSIP", _tempGPSIP);
             PlayerPrefs.Save();
-            
+
 
             Player.Instance.InitializeGPSRetriever();
 
@@ -350,7 +486,7 @@ public class MenuUIControl : MonoBehaviour
     //end GPS
     void InitMarkModeUI()
     {
-       bool nextstate = MarkerMode.Instance.allowMarking;
+        bool nextstate = MarkerMode.Instance.allowMarking;
         if (nextstate == true)
         {
             markModeBtnLabel.text = "Deactivate Marking";
@@ -358,7 +494,7 @@ public class MenuUIControl : MonoBehaviour
         else if (nextstate == false)
         {
             markModeBtnLabel.text = "Activate Marking";
-        } 
+        }
     }
     public void SetMarkMode()
     {
