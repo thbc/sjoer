@@ -220,10 +220,10 @@ namespace Assets.Positional
             mainCamera = null;
             this.EnsureMainCamera();
         }
-       
+
         #endregion
         public void calibrate()
-        {            
+        {
             this.unitytoTrueNorth(true);
         }
         private void unitytoTrueNorth(bool calibrate = false)
@@ -242,6 +242,30 @@ namespace Assets.Positional
 
             Debug.Log("Unity to true north: " + unityToTrueNorthRotation);
 
+        }
+public Transform mixedrealityPlayspace;
+        public PlayerData GetLogData()
+        {
+            PlayerData data = new PlayerData();
+
+            data.playerPos = transform.position;
+            data.playerRot = transform.rotation;
+            data.unity2TrueNorth = Unity2TrueNorth;
+            data.lastGPSUpdate_Latitude = lastGPSUpdate.Latitude;
+            data.lastGPSUpdate_Longitude = lastGPSUpdate.Longitude;
+            data.lastGPSUpdate_Heading = lastGPSUpdate.Heading;
+            data.lastGPSUpdate_SOG = lastGPSUpdate.SOG;
+            data.CalibrationHDGVessel = CalibrationHDGVessel;
+            data.CalibrationHDGHolo = CalibrationHDGHolo;
+            data.CalibrationDiff = CalibrationDiff;
+            data.cameraPos = mainCamera.transform.position;
+            data.cameraRot = mainCamera.transform.rotation;
+            if(mixedrealityPlayspace == null)
+               mixedrealityPlayspace = GameObject.Find("MixedRealityPlayspace").transform;
+            data.mrPlayspacePos = mixedrealityPlayspace.position;
+            data.mrPlayspaceRot = mixedrealityPlayspace.rotation;
+
+            return data;
         }
     }
 
