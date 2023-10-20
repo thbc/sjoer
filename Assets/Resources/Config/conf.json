@@ -2,8 +2,8 @@
   "VesselMode": false,
   "DataSettings": {
     "UpdateInterval": 0.1,
-    "LatitudeArea": 3000,
-    "LongitudeArea": 3000,
+    "LatitudeArea": 3000,  // the bounding box dimensions used for determining..
+    "LongitudeArea": 3000, // ..the reach area to retrieve vessels via API; default value: "3000"
     "UIElementHeight": 0.0,
     "SkyAreaHeightTarget": 2.0,
     "SkyAreaHeightHover": 1.0,
@@ -37,5 +37,7 @@
   "PhoneGPS": {
     "IP": "not used",
     "port":  "6000"
-  }
+  },
+  "Nightmode": false
+
 }

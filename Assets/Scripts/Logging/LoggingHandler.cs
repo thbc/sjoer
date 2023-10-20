@@ -19,6 +19,8 @@ public class LoggingHandler : MonoBehaviour
 
     public TextMesh lastLogLabel;
 
+    public PlayerCoordinates playerCoordinates;
+
     public void StartStopLogging(TextMesh _StartStopBtn)
     {
         if (!isLoggingStarted)
@@ -35,47 +37,49 @@ public class LoggingHandler : MonoBehaviour
     }
 
 
- private IEnumerator LogData()
-{
-    while (true)
+    private IEnumerator LogData()
     {
-        if (!isLoggingStarted)
+        while (true)
         {
-            initialTimestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
-            isLoggingStarted = true;
+            if (!isLoggingStarted)
+            {
+                initialTimestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
+                isLoggingStarted = true;
 
-            // Detailed CSV headers to match each specific data point being logged.
-            string header = "Date,Time," +
-                            "VesselName, VesselMode, BridgeHeight,"+
+                // Detailed CSV headers to match each specific data point being logged.
+                string header = "Date,Time," +
+                                "VesselName, VesselMode, BridgeHeight,APIReach" +
+                                "PlayerPosX,PlayerPosY,PlayerPosZ,PlayerPosition," +
+                                "PlayerRotX,PlayerRotY,PlayerRotZ,PlayerEulerRotation,PlayerRotation," +
+                                "Unity2TrueNorthX,Unity2TrueNorthY,Unity2TrueNorthZ,Unity2TrueNorthEuler,Unity2TrueNorth," +
+                                "LastGPSLat,LastGPSLong,LastGPSHeading,LastGPSSOG," +
+                                "CalibHDGVessel,CalibHDGHolo,CalibDiff," +
+                                "CameraPosX,CameraPosY,CameraPosZ,CameraPosition," +
+                                "CameraRotX,CameraRotY,CameraRotZ,CameraEulerRotation,CameraRotation," +
+                                "MRPlayspacePosX,MRPlayspacePosY,MRPlayspacePosZ,MRPlayspacePosition," +
+                                "MRPlayspaceRotX,MRPlayspaceRotY,MRPlayspaceRotZ,MRPlayspaceEulerRotation,MRPlayspaceRotation," +
+                                "PlayerCoordinatePosX,PlayerCoordinatePosY,PlayerCoordinatePosZ,PlayerCoordinatePos," +
+                                "PlayerCoordinateRotY,PlayerCoordinateRotZ,PlayerCoordinateEulerRotation,PlayerCoordinateRotation";
 
+                csvContent.AppendLine(header);
+            }
 
-                            "PlayerPosX,PlayerPosY,PlayerPosZ,PlayerPosition," +
-                            "PlayerRotX,PlayerRotY,PlayerRotZ,PlayerEulerRotation,PlayerRotation," +
-                            "Unity2TrueNorthX,Unity2TrueNorthY,Unity2TrueNorthZ,Unity2TrueNorthEuler,Unity2TrueNorth," +
-                            "LastGPSLat,LastGPSLong,LastGPSHeading,LastGPSSOG," +
-                            "CalibHDGVessel,CalibHDGHolo,CalibDiff," +
-                            "CameraPosX,CameraPosY,CameraPosZ,CameraPosition," +
-                            "CameraRotX,CameraRotY,CameraRotZ,CameraEulerRotation,CameraRotation," +
-                            "MRPlayspacePosX,MRPlayspacePosY,MRPlayspacePosZ,MRPlayspacePosition," +
-                            "MRPlayspaceRotX,MRPlayspaceRotY,MRPlayspaceRotZ,MRPlayspaceEulerRotation,MRPlayspaceRotation";
-            csvContent.AppendLine(header);
-        }
+            // Here's where we use the method from Player.Instance to get current data
+            PlayerData data = Player.Instance.GetLogData();
 
-        // Here's where we use the method from Player.Instance to get current data
-        PlayerData data = Player.Instance.GetLogData();
+            // Separate the current time into date and time parts
+            string currentDate = System.DateTime.Now.ToString("yyyy-MM-dd"); // Only the date part
+            string currentTime = System.DateTime.Now.ToString("HH:mm:ss"); // Only the time part
 
-        // Separate the current time into date and time parts
-        string currentDate = System.DateTime.Now.ToString("yyyy-MM-dd"); // Only the date part
-        string currentTime = System.DateTime.Now.ToString("HH:mm:ss"); // Only the time part
-
-        // Here we prepare the current row to be written in the CSV file, starting with date and time
-        List<string> currentRow = new List<string>
+            // Here we prepare the current row to be written in the CSV file, starting with date and time
+            List<string> currentRow = new List<string>
         {
             currentDate,
             currentTime,
             Config.Instance.conf.VesselSettingsS["VesselName"],
             Config.Instance.conf.VesselMode.ToString(),
             Config.Instance.conf.VesselSettingsD["BridgeHeight"].ToString(),
+            Config.Instance.Get_API_range().ToString(),
             data.playerPos.x.ToString(),
             data.playerPos.y.ToString(),
             data.playerPos.z.ToString(),
@@ -100,7 +104,7 @@ public class LoggingHandler : MonoBehaviour
             data.CalibrationHDGVessel.ToString(),
             data.CalibrationHDGHolo.ToString(),
             data.CalibrationDiff.ToString(),
-                  
+
             data.cameraPos.x.ToString(),
             data.cameraPos.y.ToString(),
             data.cameraPos.z.ToString(),
@@ -112,16 +116,29 @@ public class LoggingHandler : MonoBehaviour
             data.cameraRot.eulerAngles.ToString(),
             data.cameraRot.ToString(),
 
+
             data.mrPlayspacePos.x.ToString(),
             data.mrPlayspacePos.y.ToString(),
             data.mrPlayspacePos.z.ToString(),
             data.mrPlayspacePos.ToString(),
-            
+
             data.mrPlayspaceRot.eulerAngles.x.ToString(),
             data.mrPlayspaceRot.eulerAngles.y.ToString(),
             data.mrPlayspaceRot.eulerAngles.z.ToString(),
             data.mrPlayspaceRot.eulerAngles.ToString(),
-            data.mrPlayspaceRot.ToString()
+            data.mrPlayspaceRot.ToString(),
+
+            playerCoordinates.transform.position.x.ToString(),
+            playerCoordinates.transform.position.y.ToString(),
+            playerCoordinates.transform.position.z.ToString(),
+            playerCoordinates.transform.position.ToString(),
+
+            playerCoordinates.transform.rotation.eulerAngles.x.ToString(),
+            playerCoordinates.transform.rotation.eulerAngles.ToString(),
+            playerCoordinates.transform.rotation.eulerAngles.z.ToString(),
+            playerCoordinates.transform.rotation.eulerAngles.ToString(),
+            playerCoordinates.transform.rotation.ToString()
+
 
         };
 
@@ -148,7 +165,7 @@ public class LoggingHandler : MonoBehaviour
 
         // Writing the content to the file
         File.WriteAllText(filePath, csvContent.ToString());
-        lastLogLabel.text = "Last: "+ "Log_" + initialTimestamp + ".csv";
+        lastLogLabel.text = "Last: " + "Log_" + initialTimestamp + ".csv";
 
         // Clear the log buffer if you plan to continue logging new data
         csvContent.Clear();
@@ -182,7 +199,8 @@ public class LoggingHandler : MonoBehaviour
     private void OnApplicationQuit()
     {
         // Save the data when the application is closed
-        StoreLog();
+        if(isLoggingStarted)
+            StoreLog();
     }
 }
 public class PlayerData

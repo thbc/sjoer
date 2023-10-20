@@ -237,7 +237,7 @@ namespace Assets.InfoItems
       //      Debug.LogWarning("OnInfoItemRetargetted");
             if (this.meta.DesiredState == ExpandState.Target)// if (IsTarget)
             {
-            Debug.LogWarning(GetTargetHandler().name + "|" + this.DesiredState.ToString());
+         //   Debug.LogWarning(GetTargetHandler().name + "|" + this.DesiredState.ToString());
 
     //            Debug.LogWarning("OnInfoItemRetargetted - IsTarget");
 
@@ -257,7 +257,7 @@ namespace Assets.InfoItems
             //interaction for Minimizing expanded objects 
             else if (this.meta.DesiredState == ExpandState.Collapsed)  //else if (!IsTarget)
             {
-                Debug.LogWarning(GetTargetHandler().name + "|" + this.DesiredState.ToString());
+      //          Debug.LogWarning(GetTargetHandler().name + "|" + this.DesiredState.ToString());
 
        //         Debug.LogWarning("OnInfoItemRetargetted - IsNotTarget");
 

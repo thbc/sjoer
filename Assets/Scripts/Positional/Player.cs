@@ -104,14 +104,31 @@ namespace Assets.Positional
             EnsureMainCamera();
             return mainCamera;
         }
-
+        public int nightMode;
         // Black becomes transparent on HoloLens (and so do shadows)
         // Therefore, this code ensures that the scene is brightly lit
         public void SetLightIntensity(int value = 30)
         {
             Light playerLight = mainCamera.transform.GetChild(0).gameObject.GetComponent<Light>();
             playerLight.range = (float)Config.Instance.conf.UISettings["HorizonPlaneRadius"] + 1;
-            playerLight.intensity = value;
+            if(nightMode ==0)
+            {
+                playerLight.intensity = value;
+                     Debug.Log("disable nightmode; light intensity: "+ playerLight.intensity);
+            }
+            
+            else if(nightMode ==1)
+            {
+                playerLight.intensity = 15;
+                 Debug.Log("enable semi nightmode; light intensity: "+ playerLight.intensity);
+
+            }
+            else if(nightMode ==2)
+            {
+                playerLight.intensity = 1;
+                     Debug.Log("enable nightmode; light intensity: "+ playerLight.intensity);
+            }
+
         }
 
         public void EnsureMainCamera()

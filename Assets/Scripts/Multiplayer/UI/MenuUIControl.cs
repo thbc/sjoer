@@ -47,48 +47,58 @@ public class MenuUIControl : MonoBehaviour
 
     //--vessel mode
     public GameObject vesselSettingsMenu;
+    public GameObject vesselModeSettings;
 
-    public TextMesh loadedVesselModeConfigBtnLabel;
-    public TextMesh domesticVesselNameConfigLabel;
+    public TextMesh vesselModeBtnLabel;
+    public TextMesh vesselNameBtnLabel;
     public TextMesh bridgeHeighConfigLabel;
+    public TextMesh nightModeBtnLabel;
 
+    public TextMesh apiReachLabel;
 
 
     string _tempVesselName;
     double _tempBridgeHeight;
+    double _tempAPIReach;
 
     public TouchScreenKeyboard keyboard;
     public void ChangeVesselName()
     {
-        ShowKeyboard(true);
-        StartCoroutine(MonitorKeyboardInput(true));
+        ShowKeyboard(0);
+        StartCoroutine(MonitorKeyboardInput(0));
     }
     public void ChangeBridgHeight()
     {
-        ShowKeyboard(false);
-        StartCoroutine(MonitorKeyboardInput(false));
+        ShowKeyboard(1);
+        StartCoroutine(MonitorKeyboardInput(1));
     }
-    void ShowKeyboard(bool forname)
+    public void ChangeAPIReach()
     {
-        if (forname)
+        ShowKeyboard(1);
+        StartCoroutine(MonitorKeyboardInput(2));
+    }
+    void ShowKeyboard(int _keyboardTypeMode)
+    {
+        if (_keyboardTypeMode == 0)
             keyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.Default, false, false, false, false);
-        else
+        if (_keyboardTypeMode == 1)
             keyboard = TouchScreenKeyboard.Open("", TouchScreenKeyboardType.NumbersAndPunctuation, false, false, false, false);
-
     }
 
 
-    IEnumerator MonitorKeyboardInput(bool forname)
+    IEnumerator MonitorKeyboardInput(int inputMode)
     {
         // Wait while the keyboard is active
         while (keyboard != null && keyboard.status != TouchScreenKeyboard.Status.Done)
         {
             if (keyboard.status == TouchScreenKeyboard.Status.Visible)
             {
-                if (forname)
-                    domesticVesselNameConfigLabel.text = keyboard.text;
-                else
+                if (inputMode == 0)
+                    vesselNameBtnLabel.text = keyboard.text;
+                if (inputMode == 1)
                     bridgeHeighConfigLabel.text = keyboard.text + " [bridge height]";
+                if (inputMode == 2)
+                    apiReachLabel.text = keyboard.text + " [API reach]";
             }
             yield return null; // Wait for the next frame and then continue the loop
         }
@@ -96,12 +106,12 @@ public class MenuUIControl : MonoBehaviour
         // Optional: If you want to capture the final text after the keyboard is done
         if (keyboard != null)
         {
-            if (forname)
+            if (inputMode == 0)
             {
                 _tempVesselName = keyboard.text;
                 StoreVesselName();
             }
-            else
+            if (inputMode == 1)
             {
                 if (double.TryParse(keyboard.text, out _tempBridgeHeight))
                 {
@@ -109,15 +119,23 @@ public class MenuUIControl : MonoBehaviour
                     StoreBridgeHeight();
                 }
             }
+            if (inputMode == 2)
+            {
+                if (double.TryParse(keyboard.text, out _tempAPIReach))
+                {
+                    Config.Instance.Set_API_range(_tempAPIReach);
+                    StoreAPIReach();
+                }
+            }
         }
     }
     void StoreVesselName()
     {
         Config.Instance.conf.VesselSettingsS["VesselName"] = _tempVesselName;
-        PlayerPrefs.SetString("DomesticVesselName", _tempVesselName);
+        PlayerPrefs.SetString("VesselName", _tempVesselName);
         PlayerPrefs.Save();
-        domesticVesselNameConfigLabel.text = keyboard.text;
-        Debug.Log("set vessel namet to: " + domesticVesselNameConfigLabel.text);
+        vesselNameBtnLabel.text = keyboard.text;
+        Debug.Log("set vessel name to: " + vesselNameBtnLabel.text);
     }
     void StoreBridgeHeight()
     {
@@ -126,7 +144,14 @@ public class MenuUIControl : MonoBehaviour
         PlayerPrefs.Save();
         bridgeHeighConfigLabel.text = keyboard.text + " [bridge height]";
         Debug.Log("set bridge height to: " + bridgeHeighConfigLabel.text);
-
+    }
+    void StoreAPIReach()
+    {
+        Config.Instance.Set_API_range(_tempAPIReach);
+        PlayerPrefs.SetString("APIReach", _tempAPIReach.ToString());
+        PlayerPrefs.Save();
+        apiReachLabel.text = keyboard.text + " [API reach]";
+        Debug.Log("set api reach to: " + apiReachLabel.text);
     }
     public void SetVesselMode()
     {
@@ -136,15 +161,46 @@ public class MenuUIControl : MonoBehaviour
         if (!_state)
         {
             PlayerPrefs.SetInt("IsVesselMode", 0);
-            loadedVesselModeConfigBtnLabel.text = "Not on a Vessel";
+            vesselModeBtnLabel.text = "Not on a Vessel";
 
         }
         else if (_state)
         {
             PlayerPrefs.SetInt("IsVesselMode", 1);
-            loadedVesselModeConfigBtnLabel.text = "On Vessel: ";
+            vesselModeBtnLabel.text = "On Vessel: ";
+
         }
+
         Debug.Log("set vessel mode to: " + _state);
+        PlayerPrefs.Save();
+    }
+    public void SetNightMode()
+    {
+        if (Player.Instance.nightMode == 2)
+            Player.Instance.nightMode = 0;
+        else
+            Player.Instance.nightMode++;
+
+
+        if (Player.Instance.nightMode == 0)
+        {
+            PlayerPrefs.SetInt("IsNightMode", 0);
+            nightModeBtnLabel.text = "NightMode Off";
+
+        }
+        else if (Player.Instance.nightMode == 1)
+        {
+            PlayerPrefs.SetInt("IsNightMode", 1);
+            nightModeBtnLabel.text = "NightMode Half ON";
+        }
+        else if (Player.Instance.nightMode == 2)
+        {
+            PlayerPrefs.SetInt("IsNightMode", 2);
+            nightModeBtnLabel.text = "NightMode ON";
+        }
+        Player.Instance.SetLightIntensity();
+
+        Debug.Log("set night mode to: " + Player.Instance.nightMode);
         PlayerPrefs.Save();
     }
 
@@ -193,24 +249,41 @@ public class MenuUIControl : MonoBehaviour
 
     void InitVesselSettingsUI()
     {
-        int _VesselMode = PlayerPrefs.GetInt("IsVesselMode", 0); // by default is not vessel mode --> 0
-        bool _isVesselMode = false;
-        if (_VesselMode == 0)
-            loadedVesselModeConfigBtnLabel.text = "Not on a Vessel";
-        if (_VesselMode == 1)
-        {
-            _isVesselMode = true;
-            loadedVesselModeConfigBtnLabel.text = "On Vessel: ";
-        }
+        bool _isVesselMode = Config.PlayerPrefsInt_toBool(PlayerPrefs.GetInt("IsVesselMode", 0));
+        if (!_isVesselMode)
+            vesselModeBtnLabel.text = "Not on a Vessel";
+        if (_isVesselMode)
+            vesselModeBtnLabel.text = "On Vessel: ";
+
         Config.Instance.conf.VesselMode = _isVesselMode;
 
-        if (double.TryParse(PlayerPrefs.GetString("BridgeHeight", ""), out _tempBridgeHeight))
+        if (double.TryParse(PlayerPrefs.GetString("BridgeHeight", "0"), out _tempBridgeHeight))
         {
             Config.Instance.conf.VesselSettingsD["BridgeHeight"] = _tempBridgeHeight;
         }
         bridgeHeighConfigLabel.text = Config.Instance.conf.VesselSettingsD["BridgeHeight"].ToString() + " [bridge height]";
+
+        _tempVesselName = PlayerPrefs.GetString("VesselName", "");
         Config.Instance.conf.VesselSettingsS["VesselName"] = _tempVesselName;
-        domesticVesselNameConfigLabel.text = Config.Instance.conf.VesselSettingsS["VesselName"];
+        vesselNameBtnLabel.text = Config.Instance.conf.VesselSettingsS["VesselName"];
+
+
+        //nightmode
+        Player.Instance.nightMode = PlayerPrefs.GetInt("IsNightMode", 0);
+        if (Player.Instance.nightMode == 0)
+            nightModeBtnLabel.text = "NightMode Off";
+        else if (Player.Instance.nightMode == 1)
+            nightModeBtnLabel.text = "NightMode half ON";
+        else if (Player.Instance.nightMode == 2)
+            nightModeBtnLabel.text = "NightMode ON";
+        Player.Instance.SetLightIntensity();
+
+        //API reach
+        if (double.TryParse(PlayerPrefs.GetString("APIReach", "0"), out _tempAPIReach))
+        {
+            Config.Instance.Set_API_range(_tempAPIReach);
+        }
+        apiReachLabel.text = Config.Instance.Get_API_range() + " [API reach]";
 
     }
 
@@ -255,11 +328,19 @@ public class MenuUIControl : MonoBehaviour
         if (show)
         {
             HideMenus();
+            DisplayVesselModeSettings(false);
         }
 
         vesselSettingsMenu.SetActive(show);
     }
-
+    public void DisplayVesselModeSettings(bool show)
+    {
+        if (show)
+        {
+            vesselSettingsMenu.SetActive(false);
+        }
+        vesselModeSettings.SetActive(show);
+    }
     public void DisplayGPSSettings(bool show)
     {
         if (show)

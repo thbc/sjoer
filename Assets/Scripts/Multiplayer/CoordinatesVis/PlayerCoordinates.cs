@@ -20,7 +20,7 @@ public class PlayerCoordinates : MonoBehaviour
     void OnEnable()
     {
         if (usePlayerMainCam)
-            playerCam = player.mainCamera.transform;
+            playerCam = player.GetMainCamera().transform; //mainCamera
 
 
         initialY = this.transform.position.y;
