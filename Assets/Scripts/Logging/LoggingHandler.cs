@@ -4,6 +4,7 @@ using System.Text;
 using System.IO;
 using UnityEngine;
 using Assets.Positional;
+using Assets.Resources;
 
 public class LoggingHandler : MonoBehaviour
 {
@@ -34,33 +35,64 @@ public class LoggingHandler : MonoBehaviour
     }
 
 
-    private IEnumerator LogData()
+ private IEnumerator LogData()
+{
+    while (true)
     {
-        while (true)
+        if (!isLoggingStarted)
         {
-            if (!isLoggingStarted)
-            {
-                initialTimestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
-                isLoggingStarted = true;
+            initialTimestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
+            isLoggingStarted = true;
 
-                // CSV headers. Add all the parameter names here in the order they will be logged.
-                string header = "Time,PlayerPosition,PlayerRotation,Unity2TrueNorth," +
-                                "LastGPSUpdate_Latitude,LastGPSUpdate_Longitude,LastGPSUpdate_Heading,LastGPSUpdate_SOG," +
-                                "CalibrationHDGVessel,CalibrationHDGHolo,CalibrationDiff," +
-                                "CameraPosition,CameraRotation,MRPlayspacePosition,MRPlayspaceRotation";
-                csvContent.AppendLine(header);
-            }
+            // Detailed CSV headers to match each specific data point being logged.
+            string header = "Date,Time," +
+                            "VesselName, VesselMode, BridgeHeight,"+
 
-            // Here's where we use the method from Player.Instance to get current data
-            PlayerData data = Player.Instance.GetLogData();
 
-            string currentTime = System.DateTime.Now.ToString("o");
-            List<string> currentRow = new List<string>
+                            "PlayerPosX,PlayerPosY,PlayerPosZ,PlayerPosition," +
+                            "PlayerRotX,PlayerRotY,PlayerRotZ,PlayerEulerRotation,PlayerRotation," +
+                            "Unity2TrueNorthX,Unity2TrueNorthY,Unity2TrueNorthZ,Unity2TrueNorthEuler,Unity2TrueNorth," +
+                            "LastGPSLat,LastGPSLong,LastGPSHeading,LastGPSSOG," +
+                            "CalibHDGVessel,CalibHDGHolo,CalibDiff," +
+                            "CameraPosX,CameraPosY,CameraPosZ,CameraPosition," +
+                            "CameraRotX,CameraRotY,CameraRotZ,CameraEulerRotation,CameraRotation," +
+                            "MRPlayspacePosX,MRPlayspacePosY,MRPlayspacePosZ,MRPlayspacePosition," +
+                            "MRPlayspaceRotX,MRPlayspaceRotY,MRPlayspaceRotZ,MRPlayspaceEulerRotation,MRPlayspaceRotation";
+            csvContent.AppendLine(header);
+        }
+
+        // Here's where we use the method from Player.Instance to get current data
+        PlayerData data = Player.Instance.GetLogData();
+
+        // Separate the current time into date and time parts
+        string currentDate = System.DateTime.Now.ToString("yyyy-MM-dd"); // Only the date part
+        string currentTime = System.DateTime.Now.ToString("HH:mm:ss"); // Only the time part
+
+        // Here we prepare the current row to be written in the CSV file, starting with date and time
+        List<string> currentRow = new List<string>
         {
+            currentDate,
             currentTime,
+            Config.Instance.conf.VesselSettingsS["VesselName"],
+            Config.Instance.conf.VesselMode.ToString(),
+            Config.Instance.conf.VesselSettingsD["BridgeHeight"].ToString(),
+            data.playerPos.x.ToString(),
+            data.playerPos.y.ToString(),
+            data.playerPos.z.ToString(),
             data.playerPos.ToString(), // Assuming you can use ToString(), otherwise format as needed
+
+            data.playerRot.eulerAngles.x.ToString(),
+            data.playerRot.eulerAngles.y.ToString(),
+            data.playerRot.eulerAngles.z.ToString(),
             data.playerRot.eulerAngles.ToString(), // Converting Quaternion to Euler for readability
+            data.playerRot.ToString(),
+
+            data.unity2TrueNorth.eulerAngles.x.ToString(),
+            data.unity2TrueNorth.eulerAngles.y.ToString(),
+            data.unity2TrueNorth.eulerAngles.z.ToString(),
             data.unity2TrueNorth.eulerAngles.ToString(),
+            data.unity2TrueNorth.ToString(),
+
             data.lastGPSUpdate_Latitude.ToString(),
             data.lastGPSUpdate_Longitude.ToString(),
             data.lastGPSUpdate_Heading.ToString(),
@@ -68,10 +100,29 @@ public class LoggingHandler : MonoBehaviour
             data.CalibrationHDGVessel.ToString(),
             data.CalibrationHDGHolo.ToString(),
             data.CalibrationDiff.ToString(),
+                  
+            data.cameraPos.x.ToString(),
+            data.cameraPos.y.ToString(),
+            data.cameraPos.z.ToString(),
             data.cameraPos.ToString(),
+
+            data.cameraRot.eulerAngles.x.ToString(),
+            data.cameraRot.eulerAngles.y.ToString(),
+            data.cameraRot.eulerAngles.z.ToString(),
             data.cameraRot.eulerAngles.ToString(),
+            data.cameraRot.ToString(),
+
+            data.mrPlayspacePos.x.ToString(),
+            data.mrPlayspacePos.y.ToString(),
+            data.mrPlayspacePos.z.ToString(),
             data.mrPlayspacePos.ToString(),
-            data.mrPlayspaceRot.eulerAngles.ToString()
+            
+            data.mrPlayspaceRot.eulerAngles.x.ToString(),
+            data.mrPlayspaceRot.eulerAngles.y.ToString(),
+            data.mrPlayspaceRot.eulerAngles.z.ToString(),
+            data.mrPlayspaceRot.eulerAngles.ToString(),
+            data.mrPlayspaceRot.ToString()
+
         };
 
             csvContent.AppendLine(EncodeCSVRow(currentRow));
