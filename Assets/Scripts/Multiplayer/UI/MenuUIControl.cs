@@ -215,7 +215,6 @@ public class MenuUIControl : MonoBehaviour
         {
             loadedIPConfigBtnLabel.text = ConnectionController.Instance.playerConfig.partnerDeviceIP;
             loadedGPSIPConfigBtnLabel.text = Config.Instance.conf.PhoneGPS["IP"];
-            InitVesselSettingsUI();
             if (ConnectionController.Instance.playerConfig.playerSelection != PlayerConfig.PlayerSelection.Undefined)
             {
                 DisplayConnectionSettings(true);
@@ -245,6 +244,8 @@ public class MenuUIControl : MonoBehaviour
             // setupConnectionBtn.SetActive(false);
 
         }
+                    InitVesselSettingsUI();
+
     }
 
     void InitVesselSettingsUI()
@@ -254,6 +255,8 @@ public class MenuUIControl : MonoBehaviour
             vesselModeBtnLabel.text = "Not on a Vessel";
         if (_isVesselMode)
             vesselModeBtnLabel.text = "On Vessel: ";
+
+            Debug.Log("loaded vessel mode:"+ _isVesselMode + " from playerprefs: "+ PlayerPrefs.GetInt("IsVesselMode", 0));
 
         Config.Instance.conf.VesselMode = _isVesselMode;
 
@@ -339,6 +342,9 @@ public class MenuUIControl : MonoBehaviour
         {
             vesselSettingsMenu.SetActive(false);
         }
+        else
+            vesselSettingsMenu.SetActive(true);
+
         vesselModeSettings.SetActive(show);
     }
     public void DisplayGPSSettings(bool show)

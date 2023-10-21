@@ -1746,6 +1746,7 @@ MonoBehaviour:
   loggingInterval: 1
   lastLogLabel: {fileID: 687444883}
   playerCoordinates: {fileID: 1254955551}
+  LogBtnLabel: {fileID: 442877180}
 --- !u!4 &42553855
 Transform:
   m_ObjectHideFlags: 0
@@ -3514,7 +3515,7 @@ GameObject:
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
   m_StaticEditorFlags: 0
-  m_IsActive: 0
+  m_IsActive: 1
 --- !u!4 &82305836
 Transform:
   m_ObjectHideFlags: 0
@@ -14647,7 +14648,7 @@ GameObject:
   - component: {fileID: 442877181}
   - component: {fileID: 442877180}
   m_Layer: 0
-  m_Name: Label
+  m_Name: StartStopLogginBtnLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -14675,7 +14676,7 @@ TextMesh:
   m_PrefabInstance: {fileID: 0}
   m_PrefabAsset: {fileID: 0}
   m_GameObject: {fileID: 442877178}
-  m_Text: Start logging
+  m_Text: Start Logging
   m_OffsetZ: 0
   m_CharacterSize: 1
   m_LineSpacing: 1
@@ -23968,10 +23969,10 @@ MonoBehaviour:
       - m_Target: {fileID: 42553854}
         m_TargetAssemblyTypeName: LoggingHandler, Assembly-CSharp
         m_MethodName: StartStopLogging
-        m_Mode: 2
+        m_Mode: 1
         m_Arguments:
-          m_ObjectArgument: {fileID: 442877180}
-          m_ObjectArgumentAssemblyTypeName: UnityEngine.TextMesh, UnityEngine
+          m_ObjectArgument: {fileID: 0}
+          m_ObjectArgumentAssemblyTypeName: UnityEngine.Object, UnityEngine
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
@@ -36567,7 +36568,7 @@ GameObject:
   - component: {fileID: 987229428}
   - component: {fileID: 987229427}
   m_Layer: 0
-  m_Name: Label (1)
+  m_Name: EditVesselNameLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -52722,7 +52723,7 @@ GameObject:
   - component: {fileID: 1418807416}
   - component: {fileID: 1418807415}
   m_Layer: 0
-  m_Name: Label (1)
+  m_Name: EditBridgeHeightLabel
   m_TagString: Untagged
   m_Icon: {fileID: 0}
   m_NavMeshLayer: 0
@@ -78075,7 +78076,7 @@ MonoBehaviour:
       m_Calls:
       - m_Target: {fileID: 4650336336060012116}
         m_TargetAssemblyTypeName: MenuUIControl, Assembly-CSharp
-        m_MethodName: DisplayMainMenu
+        m_MethodName: DisplayVesselModeSettings
         m_Mode: 6
         m_Arguments:
           m_ObjectArgument: {fileID: 0}
@@ -78083,7 +78084,7 @@ MonoBehaviour:
           m_IntArgument: 0
           m_FloatArgument: 0
           m_StringArgument: 
-          m_BoolArgument: 1
+          m_BoolArgument: 0
         m_CallState: 2
   Events:
   - Event:

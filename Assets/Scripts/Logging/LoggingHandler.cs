@@ -21,29 +21,34 @@ public class LoggingHandler : MonoBehaviour
 
     public PlayerCoordinates playerCoordinates;
 
-    public void StartStopLogging(TextMesh _StartStopBtn)
+    public TextMesh LogBtnLabel;
+
+    public void StartStopLogging()
     {
-        if (!isLoggingStarted)
+        isLoggingStarted = !isLoggingStarted; // Toggle the logging state
+
+        if (isLoggingStarted)
         {
-            _StartStopBtn.text = "Stop logging";
+            // Prepare for logging
             csvContent = new StringBuilder();
-            StartCoroutine(LogData());
+            initialTimestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss"); // Get the timestamp when starting
+            StartCoroutine(LogData()); // Start logging
+
+            LogBtnLabel.text = "Stop Logging"; // Indicate that logging is now active
         }
-        else if (isLoggingStarted)
+        else
         {
-            _StartStopBtn.text = "Start logging";
-            StoreLog();
+            StopCoroutine(LogData()); // Stop the logging coroutine
+            StoreLog(); // Save the logged data
+
+            LogBtnLabel.text = "Start Logging"; // Indicate that logging can be started
         }
     }
 
 
     private IEnumerator LogData()
     {
-        while (true)
-        {
-            if (!isLoggingStarted)
-            {
-                initialTimestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
+       // initialTimestamp = System.DateTime.Now.ToString("yyyyMMddHHmmss");
                 isLoggingStarted = true;
 
                 // Detailed CSV headers to match each specific data point being logged.
@@ -62,7 +67,14 @@ public class LoggingHandler : MonoBehaviour
                                 "PlayerCoordinateRotY,PlayerCoordinateRotZ,PlayerCoordinateEulerRotation,PlayerCoordinateRotation";
 
                 csvContent.AppendLine(header);
-            }
+
+                LogBtnLabel.text = "Is Logging";
+        while (isLoggingStarted) // Will only log if isLoggingStarted is true
+        {
+            /* if (!isLoggingStarted)
+            {
+                
+            } */
 
             // Here's where we use the method from Player.Instance to get current data
             PlayerData data = Player.Instance.GetLogData();
@@ -170,6 +182,9 @@ public class LoggingHandler : MonoBehaviour
         // Clear the log buffer if you plan to continue logging new data
         csvContent.Clear();
         isLoggingStarted = false; // if you plan to capture a new timestamp for the next set of logs
+
+        LogBtnLabel.text = "Start Logging";
+
     }
 
     private string EncodeCSVRow(List<string> fields)
@@ -196,12 +211,12 @@ public class LoggingHandler : MonoBehaviour
         return builder.ToString();
     }
 
-    private void OnApplicationQuit()
-    {
-        // Save the data when the application is closed
-        if(isLoggingStarted)
-            StoreLog();
-    }
+    //private void OnApplicationQuit()
+    //{
+    // Save the data when the application is closed
+    // if(isLoggingStarted)
+    //  StoreLog();
+    //}
 }
 public class PlayerData
 {
@@ -220,5 +235,8 @@ public class PlayerData
     public Vector3 mrPlayspacePos;
     public Quaternion mrPlayspaceRot;
 
+
+
 }
+
 
