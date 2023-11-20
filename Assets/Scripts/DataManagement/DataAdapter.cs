@@ -47,8 +47,8 @@ namespace Assets.DataManagement
         private Tuple<double, double> getLatLon(JObject vessel, string s)
         {
             JToken val = vessel.SelectToken(s);
-            return val.Type != JTokenType.Null 
-                ? new Tuple<double, double>((double)val[0], (double)val[1]) 
+            return val.Type != JTokenType.Null
+                ? new Tuple<double, double>((double)val[0], (double)val[1])
                 : new Tuple<double, double>(double.NaN, double.NaN);
         }
 
@@ -72,8 +72,8 @@ namespace Assets.DataManagement
 
                 AISDTO vesselDTO = new AISDTO();
 
-                vesselDTO.Name        = getString(vessel, "name");
-                vesselDTO.Key         = vesselDTO.Name;
+                vesselDTO.Name = getString(vessel, "name");
+                vesselDTO.Key = vesselDTO.Name;
 
                 // Skip our own vessel when we are in vessel mode
                 if (Config.Instance.conf.VesselMode &&
@@ -81,27 +81,27 @@ namespace Assets.DataManagement
                     continue;
 
                 // By default, no target. When connecting to ECDIS this could become useful
-                vesselDTO.Target      = false;
+                vesselDTO.Target = false;
 
-                vesselDTO.Valid       = true;
-                vesselDTO.TimeStamp   = getDateTime(vessel, "timeStamp");
-                vesselDTO.SOG         = getDouble(vessel, "sog");
-                vesselDTO.Rot         = getDouble(vessel, "rot");
-                vesselDTO.NavStat     = getDouble(vessel, "navstat");
-                vesselDTO.MMSI        = getInt(vessel, "mmsi");
-                vesselDTO.COG         = getDouble(vessel, "cog");
-                vesselDTO.ShipType    = getInt(vessel, "shipType");
-                vesselDTO.IMO         = getInt(vessel, "imo");
-                vesselDTO.CallSign    = getString(vessel, "callsign");
-                vesselDTO.Draught     = getDouble(vessel, "draught");
-                vesselDTO.Heading     = getDouble(vessel, "heading");
+                vesselDTO.Valid = true;
+                vesselDTO.TimeStamp = getDateTime(vessel, "timeStamp");
+                vesselDTO.SOG = getDouble(vessel, "sog");
+                vesselDTO.Rot = getDouble(vessel, "rot");
+                vesselDTO.NavStat = getDouble(vessel, "navstat");
+                vesselDTO.MMSI = getInt(vessel, "mmsi");
+                vesselDTO.COG = getDouble(vessel, "cog");
+                vesselDTO.ShipType = getInt(vessel, "shipType");
+                vesselDTO.IMO = getInt(vessel, "imo");
+                vesselDTO.CallSign = getString(vessel, "callsign");
+                vesselDTO.Draught = getDouble(vessel, "draught");
+                vesselDTO.Heading = getDouble(vessel, "heading");
                 vesselDTO.Destination = getString(vessel, "destination");
-                vesselDTO.ETA         = getDateTime(vessel, "eta");
-                vesselDTO.Country     = getString(vessel, "country");
+                vesselDTO.ETA = getDateTime(vessel, "eta");
+                vesselDTO.Country = getString(vessel, "country");
 
                 Tuple<double, double> LatLon = getLatLon(vessel, "geometry.coordinates");
-                vesselDTO.Longitude   = LatLon.Item1;
-                vesselDTO.Latitude    = LatLon.Item2;
+                vesselDTO.Longitude = LatLon.Item1;
+                vesselDTO.Latitude = LatLon.Item2;
 
                 dto.vessels[i] = vesselDTO;
                 i++;
@@ -110,6 +110,99 @@ namespace Assets.DataManagement
             return dto;
         }
     }
+    // new code:---------------------------
+    class BarentswatchNAVAIDDataAdapter : DataAdapter
+    {
+        private double getDouble(JObject navaid, string s)
+        {
+            JToken val = navaid.GetValue(s);
+            return val.Type != JTokenType.Null ? val.ToObject<double>() : double.NaN;
+        }
+
+        private string getString(JObject navaid, string s)
+        {
+            JToken val = navaid.GetValue(s);
+            return val.Type != JTokenType.Null ? val.ToObject<string>() : string.Empty;
+        }
+
+        private int getInt(JObject navaid, string s)
+        {
+            JToken val = navaid.GetValue(s);
+            return val.Type != JTokenType.Null ? val.ToObject<int>() : 0;
+        }
+
+        private DateTime getDateTime(JObject navaid, string s)
+        {
+            JToken val = navaid.GetValue(s);
+            return val.Type != JTokenType.Null ? val.ToObject<DateTime>() : DateTime.MinValue;
+        }
+
+        private Tuple<double, double> getLatLon(JObject navaid, string s)
+        {
+            JToken val = navaid.SelectToken(s);
+            return val.Type != JTokenType.Null
+                ? new Tuple<double, double>((double)val[0], (double)val[1])
+                : new Tuple<double, double>(double.NaN, double.NaN);
+        }
+
+        public override DTO convert(string input)
+        {
+            NAVAIDDTOs dto = new NAVAIDDTOs();
+
+            if (input == "err")
+            {
+                dto.Valid = false;
+                return dto;
+            }
+
+            JArray navaids = JsonConvert.DeserializeObject<JArray>(input);
+            dto.navaids = new NAVAIDDTO[navaids.Count];
+            dto.Valid = true;
+
+            int i = 0;
+            foreach (JObject navaid in navaids)
+            {
+
+                NAVAIDDTO navaidDTO = new NAVAIDDTO();
+
+                navaidDTO.Name = getString(navaid, "name");
+                navaidDTO.Key = navaidDTO.Name;
+
+
+
+                // By default, no target. When connecting to ECDIS this could become useful
+                navaidDTO.Target = false;
+
+                navaidDTO.Valid = true;
+                navaidDTO.TimeStamp = getDateTime(navaid, "timeStamp");
+                navaidDTO.Type = getString(navaid, "sog");
+                navaidDTO.MessageType = getString(navaid, "sog");
+                navaidDTO.Mmsi = getInt(navaid, "sog");
+
+                navaidDTO.DimensionA = getInt(navaid, "sog");
+                navaidDTO.DimensionB = getInt(navaid, "sog");
+                navaidDTO.DimensionC = getInt(navaid, "sog");
+                navaidDTO.DimensionD = getInt(navaid, "sog");
+
+                navaidDTO.TypeOfAidsToNavigation = getString(navaid, "sog");
+
+                   navaidDTO.TypeOfElectronicFixingDevice = getString(navaid, "sog");
+
+
+
+                Tuple<double, double> LatLon = getLatLon(navaid, "geometry.coordinates"); //???
+                navaidDTO.Longitude = LatLon.Item1;
+                navaidDTO.Latitude = LatLon.Item2;
+
+                dto.navaids[i] = navaidDTO;
+                i++;
+            }
+
+            return dto;
+        }
+    }
+
+    //-------------------------
 
     class GPSInfoAdapter : DataAdapter
     {
@@ -146,7 +239,8 @@ namespace Assets.DataManagement
             if (splitInput.Length < 12) // || !checksum(input) || splitInput[2] == "V")
             {
                 dto.Valid = false;
-            } else
+            }
+            else
             {
                 dto.Valid = true;
 
@@ -173,11 +267,12 @@ namespace Assets.DataManagement
                 int ms = time.IndexOf(".");
                 // Some NMEA times have a random number of fractions of seconds attached, therefore, the format might vary
                 string format = ms > 0 ? "ddMMyyHHmmss." + new string('f', time.Length - 1 - ms) : "ddMMyyHHmmss";
-                return DateTime.ParseExact(date+time, format,
+                return DateTime.ParseExact(date + time, format,
                     System.Globalization.CultureInfo.InvariantCulture);
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
-                Debug.Log($"Error parrsing \"{date+time}\" DateTime: " + e);
+                Debug.Log($"Error parrsing \"{date + time}\" DateTime: " + e);
                 return DateTime.Now;
             }
         }

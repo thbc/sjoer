@@ -44,9 +44,39 @@ namespace Assets.DataManagement
         public string Country { get; set; }
 
 
-          public bool IsMarked { get; set; }
+        public bool IsMarked { get; set; }
 
     }
+    // --new class-------------------------
+
+    public class NAVAIDDTOs : DTO
+    {
+        public NAVAIDDTO[] navaids;
+    }
+
+    public class NAVAIDDTO : DTO
+    {
+        public DateTime TimeStamp { get; set; }
+        public string Type { get; set; }
+        public string MessageType { get; set; }
+        public int Mmsi { get; set; }
+        public int DimensionA { get; set; }
+        public int DimensionB { get; set; }
+        public int DimensionC { get; set; }
+        public int DimensionD { get; set; }
+        public string TypeOfAidsToNavigation { get; set; }
+        public double Latitude { get; set; }
+        public double Longitude { get; set; }
+        public string TypeOfElectronicFixingDevice { get; set; }
+
+        public string Name { get; set; }
+
+        //   public bool IsMarked { get; set; }
+
+    }
+
+
+
 
     //public class GPSInfoDTO : DTO
     //{

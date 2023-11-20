@@ -25,6 +25,13 @@ namespace Assets.Graphics
         {
             return aligner.GetWorldTransform(aisDTO.Latitude, aisDTO.Longitude);
         }
+        
+        //--new code:
+         protected Vector3 GetWorldTransform(NAVAIDDTO navaidDTO)
+        {
+            return aligner.GetWorldTransform(navaidDTO.Latitude, navaidDTO.Longitude);
+        }
+        //--
     }
 
     class AISHorizonPositioner : Positioner
@@ -55,4 +62,22 @@ namespace Assets.Graphics
                 .FaceUser(infoItem.Shape.transform.position, aligner.mainCamera.transform.position);
         }
     }
+
+    //--new code:
+
+ class NAVAIDHorizonPositioner : Positioner
+    {
+        public override void Position(InfoItem infoItem)
+        {
+            Vector3 position = GetWorldTransform((NAVAIDDTO)infoItem.GetDTO);
+            //infoItem.Shape.transform.position = HelperClasses.InfoAreaUtils.Instance.UnityCoordsToHorizonPlane(position, aligner.mainCamera.transform.position);
+            infoItem.Shape.transform.position =
+                HelperClasses.InfoAreaUtils.Instance
+                .UnityCoordsToHorizonPlane(position, aligner.mainCamera.transform.position);
+            infoItem.Shape.transform.rotation =
+                HelperClasses.InfoAreaUtils.Instance
+                .FaceUser(infoItem.Shape.transform.position, aligner.mainCamera.transform.position);
+        }
+    }
+    //--
 }

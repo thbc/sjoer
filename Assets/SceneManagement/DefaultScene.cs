@@ -29,7 +29,7 @@ namespace Assets.SceneManagement
             Player aligner = player.GetComponent<Player>();
             GraphicFactory.Instance.aligner ??= aligner;
 
-            infoCategories = new InfoCategory[2]
+            infoCategories = new InfoCategory[3]
             {
                 new ConnectedInfoCategory(
                     "AISHorizon",
@@ -40,7 +40,13 @@ namespace Assets.SceneManagement
                     "AISSky",
                     aligner,
                     DataType.AIS, DisplayArea.SkyArea,
-                    () => allInfoItems["AISHorizon"])
+                    () => allInfoItems["AISHorizon"]),
+        //----new:-----
+                new ConnectedInfoCategory(
+                    "NAVAIDHorizon",
+                    aligner,
+                    DataType.NAVAID, DisplayArea.HorizonPlane,
+                    DataConnections.BarentswatchNAVAID, DataAdapters.BarentswatchNAVAID, ParameterExtractors.BarentswatchNAVAID)
             };
 
             this.InitAllInfoItems();

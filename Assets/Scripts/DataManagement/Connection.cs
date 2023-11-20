@@ -239,6 +239,84 @@ namespace Assets.DataManagement
         }
     }
 
+    //-----new code:
+     class BarentswatchNAVAIDConnection : Connection
+    {
+        private HttpClient httpClient = new HttpClient();
+        private string token = "";
+
+        protected override async Task<bool> myConnect()
+        {
+            bool conn = false;
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Post,
+                RequestUri = new Uri(Config.Instance.barentswatch.navaid_token_url),
+                Content = new StringContent(
+                    String.Format(
+                        Config.Instance.barentswatch.navaid_auth_format,
+                        Config.Instance.barentswatch.navaid_client_id,
+                        Config.Instance.barentswatch.navaid_client_secret
+                    ),
+                    Encoding.UTF8,
+                    "application/x-www-form-urlencoded"
+                )
+            };
+
+            string content = "";
+
+            try
+            {
+                HttpResponseMessage response = await httpClient.SendAsync(httpRequestMessage);
+                response.EnsureSuccessStatusCode();
+                content = await response.Content.ReadAsStringAsync();
+                this.token = JObject.Parse(content)["access_token"].ToString();
+                conn = true;
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+            }
+
+            return await Task.Run(() => conn);
+        }
+/* 
+        private Uri getUriwithParams(string lonMin, string lonMax, string latMin, string latMax)
+        {
+            string uri = String.Format(Config.Instance.barentswatch.navaid_ais_url, lonMin, lonMax, latMin, latMax); // not the final one yet!
+            return new Uri(uri);
+        } */
+
+        // Lat Min, Lon Min, Lat Max, Lon Max
+        public override async Task<string> get(params string[] param)
+        {
+            //return await Task.Run(() => "[{\"timeStamp\":\"2021-10-26T18:04:11Z\",\"sog\":0.0,\"rot\":0.0,\"navstat\":5,\"mmsi\":258465000,\"cog\":142.3,\"geometry\":{\"type\":\"Point\",\"coordinates\":[5.317615,60.398463]},\"shipType\":60,\"name\":\"TROLLFJORD\",\"imo\":9233258,\"callsign\":\"LLVT\",\"country\":\"Norge\",\"eta\":\"2021-05-03T17:00:00\",\"destination\":\"BERGEN\",\"isSurvey\":false,\"heading\":142,\"draught\":5.5,\"a\":19,\"b\":117,\"c\":11,\"d\":11}]");
+
+
+            HttpRequestMessage httpRequestMessage = new HttpRequestMessage
+            {
+                Method = HttpMethod.Get,
+                RequestUri = new Uri(Config.Instance.barentswatch.navaid_ais_url)// getUriwithParams(param[1], param[3], param[0], param[2])
+            };
+
+            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", this.token);
+
+            try
+            {
+                HttpResponseMessage response = await httpClient.SendAsync(httpRequestMessage);
+                response.EnsureSuccessStatusCode();
+                return await response.Content.ReadAsStringAsync();
+            }
+            catch (Exception e)
+            {
+                Debug.Log(e);
+                return await Task.Run(() => "err");
+
+            }
+
+        }
+    }
+
     class MockNMEAConnection : Connection
     {
         string text = @"$GPGGA,153415.692,6023.762,N,00519.311,E,1,12,1.0,0.0,M,0.0,M,,*6E

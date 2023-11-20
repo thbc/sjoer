@@ -9,7 +9,8 @@ namespace Assets.DataManagement
     public enum DataAdapters
     {
         GPSInfo,
-        BarentswatchAIS
+        BarentswatchAIS,
+        BarentswatchNAVAID
     }
 
     public enum DataConnections
@@ -18,12 +19,14 @@ namespace Assets.DataManagement
         PhoneGPS,
         VesselGPS,
         HardcodedGPS,
-        BarentswatchAIS
+        BarentswatchAIS,
+        BarentswatchNAVAID
     }
 
     public enum ParameterExtractors
     {
         BarentswatchAIS,
+        BarentswatchNAVAID,
         None
     }
 }

@@ -23,6 +23,9 @@ namespace Assets.DataManagement
                 case DataAdapters.BarentswatchAIS:
                     adapter = new BarentswatchAISDataAdapter();
                     break;
+                    case DataAdapters.BarentswatchNAVAID:
+                    adapter = new BarentswatchNAVAIDDataAdapter();
+                    break;
                 default:
                     throw new ArgumentException("No such data adapter", nameof(dataAdapter));
             }
@@ -52,6 +55,9 @@ namespace Assets.DataManagement
                 case DataConnections.VesselGPS:
                     connection = new HardcodedGPSConnection();
                     break;
+                    case DataConnections.BarentswatchNAVAID:
+                    connection = new BarentswatchNAVAIDConnection();
+                    break;
                 default:
                     throw new ArgumentException("No such data connection", nameof(dataConnection));
             }
@@ -68,6 +74,9 @@ namespace Assets.DataManagement
             {
                 case ParameterExtractors.BarentswatchAIS:
                     extractor = new BarentswatchAISParameterExtractor(aligner);
+                    break;
+                 case ParameterExtractors.BarentswatchNAVAID:
+                    extractor = new BarentswatchNAVAIDParameterExtractor(aligner);
                     break;
                 case ParameterExtractors.None:
                     extractor = new ParameterExtractor();

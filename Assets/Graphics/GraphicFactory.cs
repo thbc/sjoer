@@ -13,28 +13,47 @@ namespace Assets.Graphics
 
         AISHorizonShapeProvider aisHorizonShapeProvider;
         AISSkyShapeProvider aisSkyShapeProvider;
+
+        NAVAIDHorizonShapeProvider navaidHorizonShapeProvider;
+
         AISHorizonFiller aisHorizonFiller;
         AISSkyFiller aisSkyFiller;
+
+        NAVAIDHorizonFiller navaidHorizonFiller;
         Filler baseFiller;
         AISHorizonPositioner aisHorizonPositioner;
         AISSkyPositioner aisSkyPositioner;
+        NAVAIDHorizonPositioner navaidHorizonPositioner;
 
         AISSkyPostProcessor aisSkyPostProcessor;
         AISHorizonPostProcessor aisHorizonPostProcessor;
 
+        NAVAIDHorizonPostProcessor navaidHorizonPostProcessor;
 
 
         public GraphicFactory()
         {
             aisHorizonShapeProvider = new AISHorizonShapeProvider();
+
+            //--new code:
+            navaidHorizonShapeProvider = new NAVAIDHorizonShapeProvider();
+            //--
             aisSkyShapeProvider = new AISSkyShapeProvider();
             aisHorizonFiller = new AISHorizonFiller();
             aisSkyFiller = new AISSkyFiller();
+
+            navaidHorizonFiller = new NAVAIDHorizonFiller();
+
             baseFiller = new Filler();
             aisHorizonPositioner = new AISHorizonPositioner();
             aisSkyPositioner = new AISSkyPositioner();
+
+            navaidHorizonPositioner = new NAVAIDHorizonPositioner();
+
             aisSkyPostProcessor = new AISSkyPostProcessor();
             aisHorizonPostProcessor = new AISHorizonPostProcessor();
+
+            navaidHorizonPostProcessor = new NAVAIDHorizonPostProcessor();
         }
 
         public PostProcessor GetPostProcessor(DataType dataType, DisplayArea displayArea)
@@ -48,6 +67,10 @@ namespace Assets.Graphics
                     break;
                 case (DataType.AIS, DisplayArea.SkyArea):
                     postProcessor = aisSkyPostProcessor;
+                    break;
+
+                case (DataType.NAVAID, DisplayArea.HorizonPlane):
+                    postProcessor = navaidHorizonPostProcessor;
                     break;
                 default:
                     throw new ArgumentException("No such data type", nameof(dataType));
@@ -69,6 +92,9 @@ namespace Assets.Graphics
                     break;
                 case (DataType.AIS, DisplayArea.SkyArea):
                     filler = aisSkyFiller;
+                    break;
+                    case (DataType.NAVAID, DisplayArea.HorizonPlane):
+                    filler = navaidHorizonFiller;
                     break;
                 default:
                     throw new ArgumentException("No such data type", nameof(dataType));
@@ -92,6 +118,10 @@ namespace Assets.Graphics
                     aisSkyPositioner.SetAligner(aligner);
                     positioner = aisSkyPositioner;
                     break;
+                      case (DataType.NAVAID, DisplayArea.HorizonPlane):
+                    navaidHorizonPositioner.SetAligner(aligner);
+                    positioner = navaidHorizonPositioner;
+                    break;
                 default:
                     throw new ArgumentException("No such data source", nameof(dataType));
             }
@@ -110,6 +140,10 @@ namespace Assets.Graphics
                     break;
                 case (DataType.AIS, DisplayArea.SkyArea):
                     shape = aisSkyShapeProvider;
+                    break;
+
+                    case (DataType.NAVAID, DisplayArea.HorizonPlane):
+                    shape = navaidHorizonShapeProvider;
                     break;
                 default:
                     throw new ArgumentException("No such data type", nameof(dataType));

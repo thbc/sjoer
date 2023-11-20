@@ -38,4 +38,26 @@ namespace Assets.DataManagement
                 };
         }
     }
+//----new code:
+    class BarentswatchNAVAIDParameterExtractor : ParameterExtractor
+    {
+        private Player aligner;
+        public BarentswatchNAVAIDParameterExtractor(Player aligner)
+        {
+            this.aligner = aligner;
+        }
+
+        public override string[] get()
+        {
+            Tuple<Vector2, Vector2> latLonArea = aligner.GetCurrentLatLonArea();
+            return new string[]
+                {
+                    // latmin lonmin latmax lonmax
+                    latLonArea.Item1.x.ToString(),
+                    latLonArea.Item1.y.ToString(),
+                    latLonArea.Item2.x.ToString(),
+                    latLonArea.Item2.y.ToString()
+                };
+        }
+    }
 }

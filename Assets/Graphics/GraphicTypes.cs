@@ -8,7 +8,7 @@ namespace Assets.Graphics
 {
     public enum DataType
     {
-        AIS
+        AIS, NAVAID
     }
 
     public enum DisplayArea

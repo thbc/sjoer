@@ -272,4 +272,12 @@ namespace Assets.Graphics
 
         }
     }
+
+    class NAVAIDHorizonPostProcessor : PostProcessor
+    {
+        protected override void Process()
+        {
+
+        }
+    }
 }

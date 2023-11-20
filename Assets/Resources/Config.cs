@@ -89,5 +89,13 @@ namespace Assets.Resources
         public string auth_format;
         public string client_id;
         public string client_secret;
+
+
+        // new navaid code:
+         public string navaid_token_url;
+        public string navaid_ais_url;
+        public string navaid_auth_format;
+        public string navaid_client_id;
+        public string navaid_client_secret;
     }
 }

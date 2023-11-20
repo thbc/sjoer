@@ -242,16 +242,9 @@ MonoBehaviour:
   m_GameObject: {fileID: 615969347}
   m_Enabled: 1
   m_EditorHideFlags: 0
-  m_Script: {fileID: 11500000, guid: 37bbecd191f62794f917bc841b97c4ac, type: 3}
+  m_Script: {fileID: 11500000, guid: 41f1c1b38eda6d44baf4edc780d76bb5, type: 3}
   m_Name: 
   m_EditorClassIdentifier: 
-  ourAPIConnection:
-    token_url: https://id.barentswatch.no/connect/token
-    client_id: 
-    client_secret: 
-    auth_format: 
-    request_url: 
-  connectionType: 1
 --- !u!4 &615969349
 Transform:
   m_ObjectHideFlags: 0

@@ -144,6 +144,18 @@ namespace Assets.InfoItems
                     AddNewInfoItem(infoItem);
                 }
             }
+            foreach (InfoItem infoItem in NAVAIDInfoItem.Generate(dto, dataType, displayArea))
+            {
+                if (IsInInfoItems(infoItem))
+                {
+                    infoItems[infoItem.Key].InjectNewDTO(infoItem.GetDTO);
+                    //infoItems[infoItem.Key].TargetNum = infoItem.TargetNum;
+                }
+                else
+                {
+                    AddNewInfoItem(infoItem);
+                }
+            }
         }
     }
 

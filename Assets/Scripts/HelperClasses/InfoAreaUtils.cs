@@ -159,7 +159,23 @@ namespace Assets.HelperClasses
             boxCollider.center = new Vector3(boxCollider.center.x, def ? 1.5f : boxCollider.size.y / 2, boxCollider.center.z);
 
         }
+//-- new code:
 
+/* public void ShowNAVAIDInfo(GameObject target, float numInfo, bool def = false)
+        {
+            BoxCollider boxCollider = target.GetComponent<BoxCollider>();
+            GameObject pin = target.transform.Find($"StickAnchor/Stick/PinAnchor").gameObject;
+            pin.transform.localScale = new Vector3(pin.transform.localScale.x, def ? 1 : pin.transform.localScale.y * numInfo, pin.transform.localScale.z);
+            GameObject icon = target.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/ShipIconAnchor").gameObject;
+            icon.transform.localScale = new Vector3(icon.transform.localScale.x, icon.transform.localScale.y, def ? 1 : icon.transform.localScale.z / numInfo);
+            GameObject labels = target.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/TopPinAnchor").gameObject;
+            labels.transform.localScale = new Vector3(labels.transform.localScale.x, labels.transform.localScale.y, def ? 1 : labels.transform.localScale.z / numInfo);
+
+            boxCollider.size = new Vector3(boxCollider.size.x, def ? 3 : boxCollider.size.y + (numInfo - 1) * boxCollider.size.y, boxCollider.size.z);
+            boxCollider.center = new Vector3(boxCollider.center.x, def ? 1.5f : boxCollider.size.y / 2, boxCollider.center.z);
+
+        } */
+//----
         public void ToggleHelperStick(GameObject g, bool enable)
         {
             GameObject helperStick = g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/StickConnection").gameObject;
@@ -180,9 +196,25 @@ namespace Assets.HelperClasses
 
             // Lastly enable/disable the target image
             g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/TopPinAnchor/TopPinAnchor2/CanvasTxt/Target").GetComponent<Image>().enabled = expandState == ExpandState.Target; ;
+        }
+//-- new code:
+  public void ToggleNAVAIDPinOverflowVisible(GameObject g, ExpandState expandState)
+        {
+            int n = (int)Config.Instance.conf.DataSettings["NumItemsOnHover"];
+
+            GetAISPinComponent(g, "1Label").enabled = n > 1 && expandState != ExpandState.Collapsed;
+            GetAISPinComponent(g, "1Value").enabled = n > 1 && expandState != ExpandState.Collapsed;
+            GetAISPinComponent(g, "2Label").enabled = n > 2 && expandState != ExpandState.Collapsed;
+            GetAISPinComponent(g, "2Value").enabled = n > 2 && expandState != ExpandState.Collapsed;
+
+            GetAISPinComponent(g, "TargetNum").enabled = expandState == ExpandState.Target;
+
+            // Lastly enable/disable the target image
+            g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/TopPinAnchor/TopPinAnchor2/CanvasTxt/Target").GetComponent<Image>().enabled = expandState == ExpandState.Target; ;
 
 
         }
+//----
 
         public void ToggleTargetActive(GameObject g, ExpandState expandState)
         {

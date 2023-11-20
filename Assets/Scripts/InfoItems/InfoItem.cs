@@ -432,5 +432,26 @@ namespace Assets.InfoItems
             }
         }
     }
+
+    class NAVAIDInfoItem : InfoItem
+    {
+        public NAVAIDInfoItem(DTO dto, DataType dataType, DisplayArea displayArea) : base(dto, dataType, displayArea)
+        {
+        }
+
+        public static new IEnumerable<InfoItem> Generate(DTO dto, DataType dataType, DisplayArea displayArea)
+        {
+            NAVAIDDTOs navaidDTOs = (NAVAIDDTOs)dto;
+
+            for (int i = 0; i < navaidDTOs.navaids.Length; i++)
+            {
+                NAVAIDDTO navaidDTO = navaidDTOs.navaids[i];
+                if (navaidDTO.Valid)
+                {
+                    yield return new AISInfoItem(navaidDTOs.navaids[i], dataType, displayArea);
+                }
+            }
+        }
+    }
 }
 

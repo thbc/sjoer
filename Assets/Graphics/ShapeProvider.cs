@@ -98,4 +98,50 @@ namespace Assets.Graphics
             HelperClasses.InfoAreaUtils.Instance.ToggleTargetActive(infoItem.Shape, infoItem.DesiredState);
         }
     }
+
+
+    // new code:----
+      class NAVAIDHorizonShapeProvider : ShapeProvider
+    {
+        public override void Get(InfoItem infoItem)
+        {
+            if (!infoItem.Shape) InjectNewShape(infoItem);
+
+            UpdateShape(infoItem);
+        }
+
+        private void UpdateShape(InfoItem infoItem)
+        {
+          //  HelperClasses.InfoAreaUtils.Instance.ToggleAISPinOverflowVisible(infoItem.Shape, infoItem.DesiredState);
+
+            // Reset sizing of these things
+         //   HelperClasses.InfoAreaUtils.Instance.ShowAISPinInfo(infoItem.Shape, 0, true);
+         //   HelperClasses.InfoAreaUtils.Instance.ScaleStick(infoItem.Shape, 0, true);
+        //    HelperClasses.InfoAreaUtils.Instance.ToggleHelperStick(infoItem.Shape, false); //4
+
+        //    switch (infoItem.DesiredState)
+        //    {
+          //      case (ExpandState.Collapsed):
+                    // Do nothing, already collapsed
+         //           break;
+         //       case (ExpandState.Hover):
+          //          HelperClasses.InfoAreaUtils.Instance.ShowAISPinInfo(infoItem.Shape, (float)Config.Instance.conf.DataSettings["NumItemsOnHover"]); //3
+           //         break;
+           //     case (ExpandState.Target):
+            //        HelperClasses.InfoAreaUtils.Instance.ScaleStick(infoItem.Shape, 2f);
+             //       HelperClasses.InfoAreaUtils.Instance.ToggleHelperStick(infoItem.Shape, true); //4
+
+               //     break;
+          //  }
+        }
+
+        private void InjectNewShape(InfoItem infoItem)
+        {
+            string prefab = "NAVAIDicon";
+            infoItem.Shape = GetShape(prefab);
+
+            // A new shape always starts collapsed
+           // HelperClasses.InfoAreaUtils.Instance.ToggleAISPinOverflowVisible(infoItem.Shape, ExpandState.Collapsed);
+        }
+    }
 }
