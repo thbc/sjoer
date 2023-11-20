@@ -39,10 +39,10 @@ namespace Assets.DataManagement
         }
     }
 //----new code:
-    class BarentswatchNAVAIDParameterExtractor : ParameterExtractor
+    class KystverketNAVAIDParameterExtractor : ParameterExtractor
     {
         private Player aligner;
-        public BarentswatchNAVAIDParameterExtractor(Player aligner)
+        public KystverketNAVAIDParameterExtractor(Player aligner)
         {
             this.aligner = aligner;
         }

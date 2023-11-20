@@ -240,7 +240,7 @@ namespace Assets.DataManagement
     }
 
     //-----new code:
-     class BarentswatchNAVAIDConnection : Connection
+     class KystverketNAVAIDConnection : Connection
     {
         private HttpClient httpClient = new HttpClient();
         private string token = "";

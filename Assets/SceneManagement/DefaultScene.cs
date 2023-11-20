@@ -46,7 +46,7 @@ namespace Assets.SceneManagement
                     "NAVAIDHorizon",
                     aligner,
                     DataType.NAVAID, DisplayArea.HorizonPlane,
-                    DataConnections.BarentswatchNAVAID, DataAdapters.BarentswatchNAVAID, ParameterExtractors.BarentswatchNAVAID)
+                    DataConnections.KystverketNAVAID, DataAdapters.KystverketNAVAID, ParameterExtractors.KystverketNAVAID)
             };
 
             this.InitAllInfoItems();

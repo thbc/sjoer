@@ -111,7 +111,7 @@ namespace Assets.DataManagement
         }
     }
     // new code:---------------------------
-    class BarentswatchNAVAIDDataAdapter : DataAdapter
+    class KystverketNAVAIDDataAdapter : DataAdapter
     {
         private double getDouble(JObject navaid, string s)
         {
