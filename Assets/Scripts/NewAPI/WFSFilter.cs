@@ -6,8 +6,7 @@ using UnityEngine.Networking;
 using Newtonsoft.Json;
 //using System.Web;
 using UnityEngine;
-
-namespace WFSRequestHelper
+namespace Assets.DataManagement.Navaids.WFSRequestHelper
 {
 
     public class WFSRequestBuilder
@@ -78,68 +77,6 @@ namespace WFSRequestHelper
 
             return $"{baseWfsUrl}?service=WFS&request=GetFeature&version=2.0.0&typename={fullTypeName}&outputFormat=GEOJSON&{keepProperties}Filter={encodedFilter}";
         }
-
-    }
-
-
-    public class KystverketData
-    {
-
-        public class FeatureCollection
-        {
-            public List<Feature> features;
-        }
-        public class Feature
-        {
-            public FeatureGeometry geometry;
-            public FeatureProperties properties;
-        }
-        public class FeatureGeometry
-        {
-            public string type;
-        }
-        public class FeatureProperties
-        {
-            public string GmlID;
-            public int OBJECTID;
-            public double Long;
-            public double Lat;
-            public string navn;
-            public string sted;
-            public string beliggenhet;
-            public string TYPEID;
-            public string GlobalID;
-        }
-
-
-        public static FeatureCollection GetFeatureCollection(string jsonString)
-        {
-            FeatureCollection featureCollection = JsonConvert.DeserializeObject<FeatureCollection>(jsonString);
-
-            return featureCollection;
-        }
-
-        public static void DebugFeaturesInFeatureCollection(FeatureCollection featureCollection)
-        {
-            foreach (var feature in featureCollection.features)
-            {
-                // Use the properties as needed
-                Debug.Log("Longitude: " + feature.properties.Long);
-                Debug.Log("Latitude: " + feature.properties.Lat);
-                Debug.Log("Name: " + feature.properties.navn);
-                Debug.Log("Place: " + feature.properties.sted);
-                Debug.Log("Location: " + feature.properties.beliggenhet);
-                Debug.Log("Type ID: " + feature.properties.TYPEID);
-                Debug.Log("Global ID: " + feature.properties.GlobalID);
-            }
-        }
-
-        private string GetTestJsonString()
-        {
-            // Your JSON string here
-            return "{\"features\":[{\"type\":\"Feature\",\"properties\":{\"Long\":5.15259852,\"Lat\":60.42475670,\"navn\":\"\",\"sted\":\"Hetlevik\",\"beliggenhet\":\"Askøy\",\"TYPEID\":\"StyrbordLateralMerke\",\"GlobalID\":\"{CFEAAE53-75B7-4ABD-8116-E6B7D35A5BD6}\"}},{\"type\":\"Feature\",\"properties\":{\"Long\":5.15334454,\"Lat\":60.42426616,\"navn\":\" \",\"sted\":\"Hetlevik\",\"beliggenhet\":\"Askøy\",\"TYPEID\":\"BabordLateralMerke\",\"GlobalID\":\"{EC5F3D5A-B948-4487-A096-6846F3AE77DB}\"}}]}";
-        }
-
 
     }
 }

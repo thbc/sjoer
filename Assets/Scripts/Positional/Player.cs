@@ -84,7 +84,6 @@ namespace Assets.Positional
             get { return unityToTrueNorthRotation; }
         }
 
-        // Start is called before the first frame update
         void Start()
         {
             InitializeGPSRetriever();
@@ -111,22 +110,22 @@ namespace Assets.Positional
         {
             Light playerLight = mainCamera.transform.GetChild(0).gameObject.GetComponent<Light>();
             playerLight.range = (float)Config.Instance.conf.UISettings["HorizonPlaneRadius"] + 1;
-            if(nightMode ==0)
+            if (nightMode == 0)
             {
                 playerLight.intensity = value;
-                     Debug.Log("disable nightmode; light intensity: "+ playerLight.intensity);
+                Debug.Log("disable nightmode; light intensity: " + playerLight.intensity);
             }
-            
-            else if(nightMode ==1)
+
+            else if (nightMode == 1)
             {
                 playerLight.intensity = 15;
-                 Debug.Log("enable semi nightmode; light intensity: "+ playerLight.intensity);
+                Debug.Log("enable semi nightmode; light intensity: " + playerLight.intensity);
 
             }
-            else if(nightMode ==2)
+            else if (nightMode == 2)
             {
                 playerLight.intensity = 1;
-                     Debug.Log("enable nightmode; light intensity: "+ playerLight.intensity);
+                Debug.Log("enable nightmode; light intensity: " + playerLight.intensity);
             }
 
         }
@@ -140,7 +139,6 @@ namespace Assets.Positional
             }
         }
 
-        // Update is called once per frame
         void Update()
         {
             EnsureMainCamera();
@@ -192,7 +190,7 @@ namespace Assets.Positional
             //return mainCamera.transform.RotateAround(mainCamera.transform.position, mainCamera.transform.position + new Vector3((float)x, (float)z, (float)y), unityToTrueNorthRotation.y);
         }
 
-        public Tuple<Vector2, Vector2> GetCurrentLatLonArea()
+        public Tuple<Vector2, Vector2> GetCurrentLatLonArea(double customRange = -1)//previously: () ; added customRange to allow for different ranges (e.g. vessel vs navaids)
         {
             double lat, lon;
 
@@ -213,18 +211,52 @@ namespace Assets.Positional
                 lon = Config.Instance.conf.NonVesselSettings["Longitude"];
             }
 
-            return HelperClasses.GPSUtils.Instance.GetCurrentLatLonArea(
-                    lat,
-                    lon
-                );
+            return HelperClasses.GPSUtils.Instance.GetCurrentLatLonArea(lat, lon, customRange);
         }
 
 
+
+        #region new added, not part of original script
+        Tuple<Vector2, Vector2> previousArea;
+        /// <summary>
+        /// New method for checking whether the curren Lat/Lon Area has changed significantly.
+        /// </summary>
+        /// <param name="toleranceMeters"></param>
+        /// <returns></returns>
+        public bool HasAreaChanged(float toleranceMeters = 10f)
+        {
+            if (previousArea == null)
+                return true;
+
+            Tuple<Vector2, Vector2> currentArea = GetCurrentLatLonArea();
+            Vector2 currentCenter = CalculateCenter(currentArea);
+            Vector2 previousCenter = CalculateCenter(previousArea);
+
+            if (Vector2.Distance(currentCenter, previousCenter) > toleranceMeters)
+            {
+                // The area has moved beyond the tolerance threshold
+                Debug.Log("Significant movement detected.");
+
+                // Update the previous area
+                previousArea = currentArea;
+                return true;
+
+            }
+            else return false;
+        }
+        private Vector2 CalculateCenter(Tuple<Vector2, Vector2> area)
+        {
+            // Calculate the center of the area
+            Vector2 center = new Vector2(
+                (area.Item1.x + area.Item2.x) / 2,
+                (area.Item1.y + area.Item2.y) / 2
+            );
+            return center;
+        }
         // The rotation that transforms the Unity north axis to True north
         // This should only be executed when Hololens and vessel are aligned
         // (and thus vessel compass information and Hololens direction match)
 
-        #region new added, not part of original script
         Camera calibrationCam;
         public void PrepareCalibration(Camera _calibCam)
         {
@@ -260,7 +292,7 @@ namespace Assets.Positional
             Debug.Log("Unity to true north: " + unityToTrueNorthRotation);
 
         }
-public Transform mixedrealityPlayspace;
+        public Transform mixedrealityPlayspace;
         public PlayerData GetLogData()
         {
             PlayerData data = new PlayerData();
@@ -277,8 +309,8 @@ public Transform mixedrealityPlayspace;
             data.CalibrationDiff = CalibrationDiff;
             data.cameraPos = mainCamera.transform.position;
             data.cameraRot = mainCamera.transform.rotation;
-            if(mixedrealityPlayspace == null)
-               mixedrealityPlayspace = GameObject.Find("MixedRealityPlayspace").transform;
+            if (mixedrealityPlayspace == null)
+                mixedrealityPlayspace = GameObject.Find("MixedRealityPlayspace").transform;
             data.mrPlayspacePos = mixedrealityPlayspace.position;
             data.mrPlayspaceRot = mixedrealityPlayspace.rotation;
 

@@ -9,7 +9,7 @@ using Assets.Resources;
 using System.Net.Sockets;
 using System.IO;
 using System.Threading;
-
+using Assets.DataManagement.Navaids.WFSRequestHelper;
 namespace Assets.DataManagement
 {
     abstract class Connection
@@ -148,7 +148,8 @@ namespace Assets.DataManagement
                 clientReceiveThread = new Thread(new ThreadStart(ListenForData));
                 clientReceiveThread.IsBackground = true;
                 clientReceiveThread.Start();
-            } catch (Exception e)
+            }
+            catch (Exception e)
             {
                 Debug.Log("On client connect exception " + e);
             }
@@ -164,11 +165,11 @@ namespace Assets.DataManagement
                 Byte[] bytes = new Byte[1024];
                 //if (DebugOnHead.Instance.gameObject.activeInHierarchy)
                 //{  
-                    //we want to always set this debug text, even if debug toggle is inactive
-                    DebugOnHead.Instance.DebugTextOnHead_1("Connected.. Listening for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"] + " on port: " + int.Parse(Config.Instance.conf.PhoneGPS["port"]));
-                               Debug.Log("Connected.. Listening for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"] + " on port: " + int.Parse(Config.Instance.conf.PhoneGPS["port"]));
-                             
-               // }
+                //we want to always set this debug text, even if debug toggle is inactive
+                DebugOnHead.Instance.DebugTextOnHead_1("Connected.. Listening for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"] + " on port: " + int.Parse(Config.Instance.conf.PhoneGPS["port"]));
+                Debug.Log("Connected.. Listening for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"] + " on port: " + int.Parse(Config.Instance.conf.PhoneGPS["port"]));
+
+                // }
                 while (running)
                 {
                     // Get a stream object for reading 				
@@ -183,28 +184,28 @@ namespace Assets.DataManagement
                             // Convert byte array to string message. 						
                             string gpsString = Encoding.ASCII.GetString(incomingData);
 
-                            
-                            
+
+
                             // Only store GPRMC strings
                             if (gpsString.Length > 5 && gpsString.Substring(0, 5).Contains("GPRMC"))
                             {
                                 lastReading = gpsString.Substring(0, gpsString.IndexOf(Environment.NewLine));
-                              //  Debug.Log("received: " + gpsString);
+                                //  Debug.Log("received: " + gpsString);
                                 //if (!string.IsNullOrEmpty(gpsString))
                                 //{
-                               //     DebugOnHead.Instance.DebugTextOnHead_1("received: " + gpsString);
-                               // }
+                                //     DebugOnHead.Instance.DebugTextOnHead_1("received: " + gpsString);
+                                // }
                             }
                             //this is for testing via the testing app and skips the "$"
                             else if (gpsString.Length > 6 && gpsString.Substring(1, 5).Contains("GPRMC"))
                             {
                                 gpsString.TrimStart('$');
                                 lastReading = gpsString.Substring(0, gpsString.IndexOf(Environment.NewLine));
-                               // Debug.Log("received: " + gpsString);
+                                // Debug.Log("received: " + gpsString);
                                 //if (!string.IsNullOrEmpty(gpsString))
                                 //{
-                               //     DebugOnHead.Instance.DebugTextOnHead_1("received: " + gpsString);
-                               // }
+                                //     DebugOnHead.Instance.DebugTextOnHead_1("received: " + gpsString);
+                                // }
                             }
 
                             if (!running)
@@ -216,14 +217,15 @@ namespace Assets.DataManagement
                 }
 
                 tcpClient.Close();
-            } catch (SocketException e)
+            }
+            catch (SocketException e)
             {
                 //if (DebugOnHead.Instance.gameObject.activeInHierarchy)
                 //{
-                    //we want to always set this debug text, even if debug toggle is inactive
-                    DebugOnHead.Instance.DebugTextOnHead_1("SocketException. Trying to listen for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"] + " on port: " + int.Parse(Config.Instance.conf.PhoneGPS["port"]));
+                //we want to always set this debug text, even if debug toggle is inactive
+                DebugOnHead.Instance.DebugTextOnHead_1("SocketException. Trying to listen for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"] + " on port: " + int.Parse(Config.Instance.conf.PhoneGPS["port"]));
                 //}
-                Debug.Log("Trying to listen for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"]+ " on port: "+int.Parse(Config.Instance.conf.PhoneGPS["port"])); // ConnectionController.Instance.playerConfig.gpsIP + " on port: "+ ConnectionController.Instance.playerConfig.gpsPort + "...but: " + "Socket Exception: " + e);
+                Debug.Log("Trying to listen for GPS data via TCP from: " + Config.Instance.conf.PhoneGPS["IP"] + " on port: " + int.Parse(Config.Instance.conf.PhoneGPS["port"])); // ConnectionController.Instance.playerConfig.gpsIP + " on port: "+ ConnectionController.Instance.playerConfig.gpsPort + "...but: " + "Socket Exception: " + e);
             }
         }
 
@@ -240,15 +242,69 @@ namespace Assets.DataManagement
     }
 
     //-----new code:
-     class KystverketNAVAIDConnection : Connection
+    class KystverketNAVAIDConnection : Connection
     {
+        string requestURLbase = "https://nfs.kystverket.no/arcgis/services/nfs/NFSSistOperativ/MapServer/WFSServer?service=WFS&request=GetFeature&version=2.0.0&";
+
         private HttpClient httpClient = new HttpClient();
-        private string token = "";
+        // private CancellationTokenSource cancellationTokenSource;
+        /*         async void Start()
+                {
+                    cancellationTokenSource = new CancellationTokenSource();
+                    try
+                    {
+                        await RepeatedlyAsyncRequest(cancellationTokenSource.Token);
+                    }
+                    catch (OperationCanceledException)
+                    {
+                        Debug.Log("Request was canceled.");
+                    }
+                    catch (Exception ex)
+                    {
+                        Debug.LogError("An error occurred: " + ex.ToString());
+                    }
+                } */
+
+        /*        private async Task RepeatedlyAsyncRequest(CancellationToken cancellationToken)
+               {
+                   while (!cancellationToken.IsCancellationRequested)
+                   {
+                       try
+                       {
+                           string result = await AsyncRequest(cancellationToken);
+                           var data = KystverketData.GetFeatureCollection(result);
+                           KystverketData.DebugFeaturesInFeatureCollection(data);
+                           //Debug.Log(result);
+                       }
+                       catch (OperationCanceledException)
+                       {
+                           Debug.Log("Request was canceled.");
+                           throw;
+                       }
+                       catch (Exception ex)
+                       {
+                           Debug.LogError($"Error in AsyncRequest: {ex.Message}");
+                       }
+                       await Task.Delay(TimeSpan.FromSeconds(60), cancellationToken);
+                   }
+               } */
+
+
+
+        public override void OnDestroy()
+        {
+            // Cancel all pending requests when the object is destroyed
+            // cancellationTokenSource?.Cancel();
+            httpClient?.Dispose();
+        }
+
 
         protected override async Task<bool> myConnect()
         {
-            bool conn = false;
-            HttpRequestMessage httpRequestMessage = new HttpRequestMessage
+            // cancellationTokenSource = new CancellationTokenSource();
+            bool conn = true;
+
+            /* HttpRequestMessage httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Post,
                 RequestUri = new Uri(Config.Instance.barentswatch.navaid_token_url),
@@ -261,45 +317,48 @@ namespace Assets.DataManagement
                     Encoding.UTF8,
                     "application/x-www-form-urlencoded"
                 )
-            };
+            }; */
 
-            string content = "";
+            /*  string content = "";
 
-            try
-            {
-                HttpResponseMessage response = await httpClient.SendAsync(httpRequestMessage);
-                response.EnsureSuccessStatusCode();
-                content = await response.Content.ReadAsStringAsync();
-                this.token = JObject.Parse(content)["access_token"].ToString();
-                conn = true;
-            }
-            catch (Exception e)
-            {
-                Debug.Log(e);
-            }
+             try
+             {
+                 HttpResponseMessage response = await httpClient.SendAsync(httpRequestMessage);
+                 response.EnsureSuccessStatusCode();
+                 content = await response.Content.ReadAsStringAsync();
+                 this.token = JObject.Parse(content)["access_token"].ToString();
+                 conn = true;
+             }
+             catch (Exception e)
+             {
+                 Debug.Log(e);
+             } */
 
             return await Task.Run(() => conn);
         }
-/* 
-        private Uri getUriwithParams(string lonMin, string lonMax, string latMin, string latMax)
-        {
-            string uri = String.Format(Config.Instance.barentswatch.navaid_ais_url, lonMin, lonMax, latMin, latMax); // not the final one yet!
-            return new Uri(uri);
-        } */
+        /* 
+                private Uri getUriwithParams(string lonMin, string lonMax, string latMin, string latMax)
+                {
+                    string uri = String.Format(Config.Instance.barentswatch.navaid_ais_url, lonMin, lonMax, latMin, latMax); // not the final one yet!
+                    return new Uri(uri);
+                } */
 
         // Lat Min, Lon Min, Lat Max, Lon Max
-        public override async Task<string> get(params string[] param)
+        public override async Task<string> get(params string[] param)// string lonMin, string lonMax, string latMin, string latMax --> param[1], param[3], param[0], param[2]
         {
-            //return await Task.Run(() => "[{\"timeStamp\":\"2021-10-26T18:04:11Z\",\"sog\":0.0,\"rot\":0.0,\"navstat\":5,\"mmsi\":258465000,\"cog\":142.3,\"geometry\":{\"type\":\"Point\",\"coordinates\":[5.317615,60.398463]},\"shipType\":60,\"name\":\"TROLLFJORD\",\"imo\":9233258,\"callsign\":\"LLVT\",\"country\":\"Norge\",\"eta\":\"2021-05-03T17:00:00\",\"destination\":\"BERGEN\",\"isSurvey\":false,\"heading\":142,\"draught\":5.5,\"a\":19,\"b\":117,\"c\":11,\"d\":11}]");
+            //param[1], param[3], param[0], param[2]
+            //5.135830, 5.167121, 60.417901, 60.430572
+            double minLong = double.Parse(param[1]);
+            double maxLong = double.Parse(param[3]);
+            double minLat = double.Parse(param[0]);
+            double maxLat = double.Parse(param[2]);
 
-
+            string wfsRequestUrlFastsjømerke = WFSRequestBuilder.Request_Seamarkers(minLong, maxLong, minLat, maxLat);
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage
             {
                 Method = HttpMethod.Get,
-                RequestUri = new Uri(Config.Instance.barentswatch.navaid_ais_url)// getUriwithParams(param[1], param[3], param[0], param[2])
+                RequestUri = new Uri(wfsRequestUrlFastsjømerke)
             };
-
-            httpRequestMessage.Headers.Authorization = new AuthenticationHeaderValue("Bearer", this.token);
 
             try
             {
@@ -307,12 +366,14 @@ namespace Assets.DataManagement
                 response.EnsureSuccessStatusCode();
                 return await response.Content.ReadAsStringAsync();
             }
+
             catch (Exception e)
             {
                 Debug.Log(e);
                 return await Task.Run(() => "err");
 
             }
+
 
         }
     }
@@ -550,30 +611,30 @@ namespace Assets.DataManagement
 }
 
 
-   //Sjoer only storing GPRMC data..
-   /*
-   GPRMC (Recommended Minimum Specific GNSS Data): This sentence provides the essential fix data which is recommended for GPS applications. The data it can contain includes:
-        Time of fix
-        Latitude and Longitude
-        Speed over ground
-        Course over ground (True north reference)
-        Date
-        Magnetic variation (in some cases)
-        Mode (A=Autonomous, D=Differential, E=Estimated, N=Invalid)
+//Sjoer is only storing GPRMC data..
+/*
+GPRMC (Recommended Minimum Specific GNSS Data): This sentence provides the essential fix data which is recommended for GPS applications. The data it can contain includes:
+     Time of fix
+     Latitude and Longitude
+     Speed over ground
+     Course over ground (True north reference)
+     Date
+     Magnetic variation (in some cases)
+     Mode (A=Autonomous, D=Differential, E=Estimated, N=Invalid)
 
-    GPGGA (Global Positioning System Fix Data): This sentence provides detailed fix information, including time, location, and fix-related data. The data it can contain includes:
-        Time of fix
-        Latitude and Longitude
-        Fix quality (0=invalid, 1=GPS fix, 2=Differential GPS fix, and others)
-        Number of satellites being tracked
-        Horizontal dilution of precision (a measure of the geometric quality of the satellite configuration)
-        Altitude (above mean sea level)
-        Height of geoid above WGS84 ellipsoid
+ GPGGA (Global Positioning System Fix Data): This sentence provides detailed fix information, including time, location, and fix-related data. The data it can contain includes:
+     Time of fix
+     Latitude and Longitude
+     Fix quality (0=invalid, 1=GPS fix, 2=Differential GPS fix, and others)
+     Number of satellites being tracked
+     Horizontal dilution of precision (a measure of the geometric quality of the satellite configuration)
+     Altitude (above mean sea level)
+     Height of geoid above WGS84 ellipsoid
 
-    GPGSA (GNSS DOP and Active Satellites): This sentence provides information on the nature of the fix, including the satellites that were used and the dilution of precision. The data it can contain includes:
-        Mode (M=Manual, A=Automatic)
-        Fix type (1=Not fixed, 2=2D fix, 3=3D fix)
-        Satellite PRNs used for the fix (up to 12)
-        Positional dilution of precision (PDOP)
-        Horizontal dilution of precision (HDOP)
-        Vertical dilution of precision (VDOP) */
+ GPGSA (GNSS DOP and Active Satellites): This sentence provides information on the nature of the fix, including the satellites that were used and the dilution of precision. The data it can contain includes:
+     Mode (M=Manual, A=Automatic)
+     Fix type (1=Not fixed, 2=2D fix, 3=3D fix)
+     Satellite PRNs used for the fix (up to 12)
+     Positional dilution of precision (PDOP)
+     Horizontal dilution of precision (HDOP)
+     Vertical dilution of precision (VDOP) */

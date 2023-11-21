@@ -144,7 +144,7 @@ namespace Assets.InfoItems
                     AddNewInfoItem(infoItem);
                 }
             }
-            foreach (InfoItem infoItem in NAVAIDInfoItem.Generate(dto, dataType, displayArea))
+            /* foreach (InfoItem infoItem in NAVAIDInfoItem.Generate(dto, dataType, displayArea))
             {
                 if (IsInInfoItems(infoItem))
                 {
@@ -155,7 +155,7 @@ namespace Assets.InfoItems
                 {
                     AddNewInfoItem(infoItem);
                 }
-            }
+            } */
         }
     }
 

@@ -95,11 +95,20 @@ namespace Assets.HelperClasses
             return degrees + (minutes / 60);
         }
 
-        public Tuple<Vector2, Vector2> GetCurrentLatLonArea(double lat, double lon)
+        public Tuple<Vector2, Vector2> GetCurrentLatLonArea(double lat, double lon, double customRange = -1) //previously: (double lat, double lon) ; added customRange to allow for different ranges (e.g. vessel vs navaids)
         {
-            //offsets in meters
-            double dn = Config.Instance.conf.DataSettings["LatitudeArea"];
-            double de = Config.Instance.conf.DataSettings["LongitudeArea"];
+            double dn;
+            double de;
+            if(customRange != -1)
+             {
+                dn =customRange;
+                de = customRange;
+            }else{
+                //offsets in meters
+                dn = Config.Instance.conf.DataSettings["LatitudeArea"];
+                de = Config.Instance.conf.DataSettings["LongitudeArea"];
+            } 
+           
 
             return new Tuple<Vector2, Vector2>(
                 OffsetLatLonByMeter(lat, lon, -dn, -de),
