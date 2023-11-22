@@ -433,7 +433,7 @@ namespace Assets.InfoItems
         }
     }
 
-    class NAVAIDInfoItem : InfoItem
+   /*  class NAVAIDInfoItem : InfoItem
     {
         public NAVAIDInfoItem(DTO dto, DataType dataType, DisplayArea displayArea) : base(dto, dataType, displayArea)
         {
@@ -452,6 +452,6 @@ namespace Assets.InfoItems
                 }
             }
         }
-    }
+    } */
 }
 

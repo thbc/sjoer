@@ -49,7 +49,7 @@ namespace Assets.DataManagement
     }
     // --new class-------------------------
 
-    public class NAVAIDDTOs : DTO
+    /* public class NAVAIDDTOs : DTO
     {
         public NAVAIDDTO[] navaids;
     }
@@ -75,7 +75,7 @@ namespace Assets.DataManagement
 
     }
 
-
+ */
 
 
     //public class GPSInfoDTO : DTO

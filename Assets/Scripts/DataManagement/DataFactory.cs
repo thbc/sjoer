@@ -23,9 +23,9 @@ namespace Assets.DataManagement
                 case DataAdapters.BarentswatchAIS:
                     adapter = new BarentswatchAISDataAdapter();
                     break;
-                    case DataAdapters.KystverketNAVAID:
+                   /*  case DataAdapters.KystverketNAVAID:
                     adapter = new KystverketNAVAIDDataAdapter();
-                    break;
+                    break; */
                 default:
                     throw new ArgumentException("No such data adapter", nameof(dataAdapter));
             }
@@ -55,9 +55,9 @@ namespace Assets.DataManagement
                 case DataConnections.VesselGPS:
                     connection = new HardcodedGPSConnection();
                     break;
-                    case DataConnections.KystverketNAVAID:
+                    /* case DataConnections.KystverketNAVAID:
                     connection = new KystverketNAVAIDConnection();
-                    break;
+                    break; */
                 default:
                     throw new ArgumentException("No such data connection", nameof(dataConnection));
             }
@@ -75,9 +75,9 @@ namespace Assets.DataManagement
                 case ParameterExtractors.BarentswatchAIS:
                     extractor = new BarentswatchAISParameterExtractor(aligner);
                     break;
-                 case ParameterExtractors.KystverketNAVAID:
+                /*  case ParameterExtractors.KystverketNAVAID:
                     extractor = new KystverketNAVAIDParameterExtractor(aligner);
-                    break;
+                    break; */
                 case ParameterExtractors.None:
                     extractor = new ParameterExtractor();
                     break;

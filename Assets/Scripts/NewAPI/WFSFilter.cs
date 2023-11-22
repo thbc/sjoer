@@ -15,6 +15,8 @@ namespace Assets.DataManagement.Navaids.WFSRequestHelper
         private static readonly string typeName = "nfs_NFSSistOperativ:Fastsjømerke";
         private static readonly string baseWfsUrl = "https://nfs.kystverket.no/arcgis/services/nfs/NFSSistOperativ/MapServer/WFSServer";
 
+
+
         /// <summary>
         /// The Seamarkers, in our case PortHand and StarboardHand.
         /// </summary>
@@ -24,10 +26,10 @@ namespace Assets.DataManagement.Navaids.WFSRequestHelper
         /// <param name="minLat"></param>
         /// <param name="maxLat"></param>
         /// <returns></returns>
-        public static string Request_Seamarkers(double minLong, double maxLong, double minLat, double maxLat)
+        public static string Request_SeamarkersBeacon(double minLong, double maxLong, double minLat, double maxLat)
         {
             string[] typeIds = new string[] { "BabordLateralMerke", "StyrbordLateralMerke" };
-            string wfsRequestUrl = BuildWfsRequestUrl("Fastsjømerke", typeIds, minLong, maxLong, minLat, maxLat);
+            string wfsRequestUrl = BuildWfsRequestUrl(new string[]{"Fastsjømerke","Flytendemerke"}, minLong, maxLong, minLat, maxLat,typeIds);
             return wfsRequestUrl;
         }
         /// <summary>
@@ -38,15 +40,32 @@ namespace Assets.DataManagement.Navaids.WFSRequestHelper
         /// <param name="minLat"></param>
         /// <param name="maxLat"></param>
         /// <returns></returns>
-        public static string Request_KardinalMark(double minLong, double maxLong, double minLat, double maxLat)
+        public static string Request_SeamarkersCardinal(double minLong, double maxLong, double minLat, double maxLat)
         {
             string[] typeIds = new string[] { "NordKardinalBøye", "ØstKardinalBøye", "SørKardinalBøye", "VestKardinalBøye" };
-            string wfsRequestUrl = BuildWfsRequestUrl("Flytendemerke", typeIds, minLong, maxLong, minLat, maxLat);
+            string wfsRequestUrl = BuildWfsRequestUrl(new string[]{"Flytendemerke"}, minLong, maxLong, minLat, maxLat,typeIds);
             return wfsRequestUrl;
         }
-        public static string BuildWfsRequestUrl(string typeName, string[] typeIds, double minLong, double maxLong, double minLat, double maxLat)
+
+           public static string Request_SeamarkersLight(double minLong, double maxLong, double minLat, double maxLat)
         {
-            string fullTypeName = "NFSSistOperativ:" + typeName;
+            //string[] typeIds = new string[] { "NordKardinalBøye", "ØstKardinalBøye", "SørKardinalBøye", "VestKardinalBøye" };
+            string wfsRequestUrl = BuildWfsRequestUrl(new string[]{"Lys"}, minLong, maxLong, minLat, maxLat);
+            return wfsRequestUrl;
+        }
+        public static string BuildWfsRequestUrl(string[] typeNames, double minLong, double maxLong, double minLat, double maxLat,string[] typeIds=null)
+        {
+            string fullTypeName="";
+            
+            for (int i = 0; i < typeNames.Length; i++)            
+            {
+                typeNames[i] = "NFSSistOperativ:" + typeNames[i];
+                if(string.IsNullOrEmpty(fullTypeName))
+                    fullTypeName = typeNames[i];
+                else fullTypeName = fullTypeName+ "," + typeNames[i];
+
+            }
+
             XNamespace ogc = ogcNamespace;
 
             var typeIdFilters = typeIds.Select(typeId =>
@@ -71,11 +90,10 @@ namespace Assets.DataManagement.Navaids.WFSRequestHelper
                         new XElement(ogc + "Literal", maxLat.ToString()))
                 )
             );
-
-            string encodedFilter = UnityWebRequest.EscapeURL(filter.ToString(SaveOptions.DisableFormatting));
             string keepProperties = "propertyName=nfs_NFSSistOperativ:Long,nfs_NFSSistOperativ:Lat,nfs_NFSSistOperativ:navn,nfs_NFSSistOperativ:sted,nfs_NFSSistOperativ:beliggenhet,nfs_NFSSistOperativ:TYPEID,nfs_NFSSistOperativ:GlobalID&";
 
-            return $"{baseWfsUrl}?service=WFS&request=GetFeature&version=2.0.0&typename={fullTypeName}&outputFormat=GEOJSON&{keepProperties}Filter={encodedFilter}";
+            string encodedFilter = UnityWebRequest.EscapeURL(filter.ToString(SaveOptions.DisableFormatting));
+            return $"{baseWfsUrl}?service=WFS&request=GetFeature&version=2.0.0&typename={fullTypeName}&outputFormat=CSV&{keepProperties}Filter={encodedFilter}";
         }
 
     }

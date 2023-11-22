@@ -21,7 +21,9 @@ namespace Assets.Positional
         private float CalibrationHDGVessel = 0;
         private float CalibrationHDGHolo = 0;
         private float CalibrationDiff = 0;
-
+        /// <summary>
+        /// This is subscribed to the onComplete Action of Timer and therefore invoked when "GPSTimer.Update();" is done.
+        /// </summary>
         private async void updateGPS()
         {
             lastGPSUpdate = (AISDTO)await gpsRetriever.fetch();
@@ -31,22 +33,14 @@ namespace Assets.Positional
             {
                 if (DebugOnHead.Instance.gameObject.activeInHierarchy)
                 {
-                    DebugOnHead.Instance.DebugTextOnHead_2("updateGPS: " +
-                "Lat: " + lastGPSUpdate.Latitude +
-                "Lon: " + lastGPSUpdate.Longitude +
-                "Heading: " + lastGPSUpdate.Heading +
-                "SOG: " + lastGPSUpdate.SOG);
+                    DebugOnHead.Instance.DebugTextOnHead_2("updateGPS: " + "Lat: " + lastGPSUpdate.Latitude + "Lon: " + lastGPSUpdate.Longitude + "Heading: " + lastGPSUpdate.Heading + "SOG: " + lastGPSUpdate.SOG);
                 }
             }
             else
             {
                 if (DebugOnHead.Instance.gameObject.activeInHierarchy)
                 {
-                    DebugOnHead.Instance.DebugTextOnHead_2("GPS data invalid or null: " +
-                    "Lat: " + lastGPSUpdate.Latitude +
-                    "Lon: " + lastGPSUpdate.Longitude +
-                    "Heading: " + lastGPSUpdate.Heading +
-                    "SOG: " + lastGPSUpdate.SOG);
+                    DebugOnHead.Instance.DebugTextOnHead_2("GPS data invalid or null: " + "Lat: " + lastGPSUpdate.Latitude + "Lon: " + lastGPSUpdate.Longitude + "Heading: " + lastGPSUpdate.Heading + "SOG: " + lastGPSUpdate.SOG);
                 }
             }
 
@@ -62,7 +56,18 @@ namespace Assets.Positional
             }
 #endif
 
+            //here we want to check if the position changed between the previous GPSUpdate and the current one:
+            if (lastGPSUpdate.Latitude != previousGPSLat || lastGPSUpdate.Longitude != previousGPSLon)
+            {
+                OnPlayerPositionChanged?.Invoke();
+                previousGPSLon = lastGPSUpdate.Longitude;
+                previousGPSLat = lastGPSUpdate.Latitude;
+            }
+
         }
+        public Action OnPlayerPositionChanged;
+        double previousGPSLat;
+        double previousGPSLon;
 
         public Vector2 GetLatLon
         {
@@ -161,6 +166,10 @@ namespace Assets.Positional
         private void OnDestroy()
         {
             gpsRetriever.OnDestroy();
+           
+            if(OnPlayerPositionChanged != null)
+                OnPlayerPositionChanged = null;
+        
         }
 
         public Vector3 GetWorldTransform(double lat, double lon)

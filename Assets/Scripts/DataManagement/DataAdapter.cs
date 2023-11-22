@@ -111,7 +111,7 @@ namespace Assets.DataManagement
         }
     }
     // new code:---------------------------
-    class KystverketNAVAIDDataAdapter : DataAdapter
+ /*    class KystverketNAVAIDDataAdapter : DataAdapter
     {
         private double getDouble(JObject navaid, string s)
         {
@@ -200,7 +200,7 @@ namespace Assets.DataManagement
 
             return dto;
         }
-    }
+    } */
 
     //-------------------------
 

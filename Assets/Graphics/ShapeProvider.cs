@@ -101,7 +101,7 @@ namespace Assets.Graphics
 
 
     // new code:----
-      class NAVAIDHorizonShapeProvider : ShapeProvider
+    /*   class NAVAIDHorizonShapeProvider : ShapeProvider
     {
         public override void Get(InfoItem infoItem)
         {
@@ -143,5 +143,5 @@ namespace Assets.Graphics
             // A new shape always starts collapsed
            // HelperClasses.InfoAreaUtils.Instance.ToggleAISPinOverflowVisible(infoItem.Shape, ExpandState.Collapsed);
         }
-    }
+    } */
 }

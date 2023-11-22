@@ -27,10 +27,10 @@ namespace Assets.Graphics
         }
         
         //--new code:
-         protected Vector3 GetWorldTransform(NAVAIDDTO navaidDTO)
+      /*    protected Vector3 GetWorldTransform(NAVAIDDTO navaidDTO)
         {
             return aligner.GetWorldTransform(navaidDTO.Latitude, navaidDTO.Longitude);
-        }
+        } */
         //--
     }
 
@@ -65,7 +65,7 @@ namespace Assets.Graphics
 
     //--new code:
 
- class NAVAIDHorizonPositioner : Positioner
+ /* class NAVAIDHorizonPositioner : Positioner
     {
         public override void Position(InfoItem infoItem)
         {
@@ -78,6 +78,6 @@ namespace Assets.Graphics
                 HelperClasses.InfoAreaUtils.Instance
                 .FaceUser(infoItem.Shape.transform.position, aligner.mainCamera.transform.position);
         }
-    }
+    } */
     //--
 }
