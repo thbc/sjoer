@@ -8,7 +8,7 @@ using UnityEngine;
 namespace Assets.HelperClasses
 {
     [Serializable]
-    public class StringTextTuple : SerializableKeyValuePair<string, TextAsset> 
+    public class StringTextTuple : SerializableKeyValuePair<string, TextAsset>
     {
         public StringTextTuple(string item1, TextAsset item2) : base(item1, item2) { }
     }
@@ -74,6 +74,7 @@ namespace Assets.HelperClasses
             }
         }
     }
+
 
     // Taken from https://gist.github.com/bellicapax/0838bfa4cff863d07baf78644a6a6b9b
     [Serializable]
@@ -152,4 +153,5 @@ namespace Assets.HelperClasses
         }
 
     }
+    
 }

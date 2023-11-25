@@ -23,6 +23,23 @@ namespace Assets.HelperClasses
                 );
 
         }
+        /// <summary>
+        /// New variant for setting Y offset as well
+        /// </summary>
+        /// <param name="obj"></param>
+        /// <param name="player"></param>
+        /// <returns></returns>
+        public Vector3 UnityCoordsToHorizonPlane(Vector3 obj, Vector3 player, float Yoffset)
+        {
+            Vector3 dir = (obj - player).normalized;
+            Vector3 newPosition = player + dir * (float)Config.Instance.conf.UISettings["HorizonPlaneRadius"];
+            return new Vector3(
+                    newPosition.x,
+                    (float)Config.Instance.conf.VesselSettingsD["BridgeHeight"] - (float)Config.Instance.conf.DataSettings["UIElementHeight"]-Yoffset, // newPosition.y > align with the horizon. TODO: Get layer number
+                    newPosition.z
+                );
+
+        }
 
         public Vector3 UnityCoordsToSkyArea(Vector3 obj, ExpandState expandState, Player player)
         {
@@ -197,24 +214,7 @@ namespace Assets.HelperClasses
             // Lastly enable/disable the target image
             g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/TopPinAnchor/TopPinAnchor2/CanvasTxt/Target").GetComponent<Image>().enabled = expandState == ExpandState.Target; ;
         }
-//-- new code:
-  public void ToggleNAVAIDPinOverflowVisible(GameObject g, ExpandState expandState)
-        {
-            int n = (int)Config.Instance.conf.DataSettings["NumItemsOnHover"];
 
-            GetAISPinComponent(g, "1Label").enabled = n > 1 && expandState != ExpandState.Collapsed;
-            GetAISPinComponent(g, "1Value").enabled = n > 1 && expandState != ExpandState.Collapsed;
-            GetAISPinComponent(g, "2Label").enabled = n > 2 && expandState != ExpandState.Collapsed;
-            GetAISPinComponent(g, "2Value").enabled = n > 2 && expandState != ExpandState.Collapsed;
-
-            GetAISPinComponent(g, "TargetNum").enabled = expandState == ExpandState.Target;
-
-            // Lastly enable/disable the target image
-            g.transform.Find($"StickAnchor/Stick/PinAnchor/AISPinTarget/TopPinAnchor/TopPinAnchor2/CanvasTxt/Target").GetComponent<Image>().enabled = expandState == ExpandState.Target; ;
-
-
-        }
-//----
 
         public void ToggleTargetActive(GameObject g, ExpandState expandState)
         {

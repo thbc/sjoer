@@ -20,10 +20,8 @@ namespace Assets.DataManagement.Navaids
         private HttpClient httpClient = new HttpClient();
         private CancellationTokenSource cancellationTokenSource;
 
-        public enum NavaidTypes
-        {
-            BeaconMarker, CardinalMarker, Lights
-        }
+    
+        
         async void Start()
         {
             cancellationTokenSource = new CancellationTokenSource();
@@ -44,10 +42,9 @@ namespace Assets.DataManagement.Navaids
         }
         private Tuple<Vector2, Vector2> previousLatLonArea = null;
         public double[] boundingBox;
-        ///
-        public NavaidData.FeatureCollection seamarkersBeacon = new NavaidData.FeatureCollection();
-        public NavaidData.FeatureCollection seamarkersCardinal = new NavaidData.FeatureCollection();
-        public NavaidData.FeatureCollection seamarkersLight = new NavaidData.FeatureCollection();
+
+
+        public List<NavaidData.Navaid> retrievedFeatures = new List<NavaidData.Navaid>();
 
         public NavaidDataFactory navaidDataFactory;
         private async Task CheckPositionBbox(CancellationToken cancellationToken)
@@ -64,7 +61,7 @@ namespace Assets.DataManagement.Navaids
                         latLonArea.Item2.x.ToString(),
                         latLonArea.Item2.y.ToString() */
                         //boundingBox = new double[4] { 5.135830, 5.167121, 60.417901, 60.430572 };
-                        Tuple<Vector2, Vector2> currLatLonArea = Player.Instance.GetCurrentLatLonArea();//(10000);
+                        Tuple<Vector2, Vector2> currLatLonArea = Player.Instance.GetCurrentLatLonArea(10000);//(10000);
                         Debug.LogWarning(currLatLonArea.ToString());
                         boundingBox = new double[4] { currLatLonArea.Item1.y, currLatLonArea.Item2.y, currLatLonArea.Item1.x, currLatLonArea.Item2.x };
 
@@ -72,27 +69,40 @@ namespace Assets.DataManagement.Navaids
                         // include other types of cardinal markers that are not Flytandemerke (floating devices)
 
 
-                        seamarkersBeacon = new NavaidData.FeatureCollection();
-                        string result_seamarkersBeacon = await AsyncRequest(cancellationToken, NavaidTypes.BeaconMarker, boundingBox);
+                        string result_Lys = await AsyncRequest(cancellationToken,boundingBox, "Lys");
 
-                       // seamarkersCardinal = new NavaidData.FeatureCollection();
-                       // string result_seamarkersCardinal = await AsyncRequest(cancellationToken, NavaidTypes.CardinalMarker, boundingBox);
+                        /* NavaidData.NavaidDataParser parser = new NavaidData.NavaidDataParser();
+                        retrievedFeatures = parser.GetNavaidFeaturesFromString(result_seamarkersBeacon); */
+                        NavaidData.NavaidDataXMLParser parser = new NavaidData.NavaidDataXMLParser();
+                        retrievedFeatures = parser.ParseXml(result_Lys);
+                        Debug.LogWarning(NavaidData.BabordLateralCounter+ "(BabordLateralCounter)||"+NavaidData.StyrbordLateralCounter+ "(StyrbordLateralCounter)||"+NavaidData.LyktefundamentCounter+ "(LyktefundamentCounter)||"+NavaidData.kardinalCounter+ "(kardinalCounter)||");
 
-                     //   seamarkersLight = new NavaidData.FeatureCollection();
-                     //   string result_seamarkersLight = await AsyncRequest(cancellationToken, NavaidTypes.Lights, boundingBox);
+                        string result_IB = await AsyncRequest(cancellationToken,boundingBox, "IB");
+                        retrievedFeatures.AddRange(parser.ParseXml(result_IB));
+                        Debug.LogWarning(NavaidData.BabordLateralCounter+ "(BabordLateralCounter)||"+NavaidData.StyrbordLateralCounter+ "(StyrbordLateralCounter)||"+NavaidData.LyktefundamentCounter+ "(LyktefundamentCounter)||"+NavaidData.kardinalCounter+ "(kardinalCounter)||");
 
-                        seamarkersBeacon = NavaidData.GetFeatureCollection(result_seamarkersBeacon);
-                      //  seamarkersCardinal = NavaidData.GetFeatureCollection(result_seamarkersCardinal);
-                     //   seamarkersLight = NavaidData.GetFeatureCollection(result_seamarkersLight);
 
-                        var allSeamarkersFeatures = new List<NavaidData.Feature>(seamarkersBeacon.features);
-                       // allSeamarkersFeatures.AddRange(seamarkersCardinal.features);
-                       // allSeamarkersFeatures.AddRange(seamarkersLight.features);
+                        // seamarkersCardinal = new NavaidData.FeatureCollection();
+                        // string result_seamarkersCardinal = await AsyncRequest(cancellationToken, NavaidTypes.CardinalMarker, boundingBox);
 
-                        var allSeamarkers = new NavaidData.FeatureCollection { features = allSeamarkersFeatures };
+                        //   seamarkersLight = new NavaidData.FeatureCollection();
+                        //   string result_seamarkersLight = await AsyncRequest(cancellationToken, NavaidTypes.Lights, boundingBox);
+
+                        //  seamarkersBeacon = NavaidData.GetFeatureCollection(result_seamarkersBeacon);
+                        //  seamarkersCardinal = NavaidData.GetFeatureCollection(result_seamarkersCardinal);
+                        //   seamarkersLight = NavaidData.GetFeatureCollection(result_seamarkersLight);
+
+                        //   var allSeamarkersFeatures = new List<NavaidData.Feature>(seamarkersBeacon.features);
+                        // allSeamarkersFeatures.AddRange(seamarkersCardinal.features);
+                        // allSeamarkersFeatures.AddRange(seamarkersLight.features);
+
+                        //  var allSeamarkers = new NavaidData.FeatureCollection { features = allSeamarkersFeatures };
 
                         //NavaidData.DebugNavaidsInNavaidCollection(fixedSeamarkers);
-                        navaidDataFactory.UpdateFeatures(allSeamarkers);
+                        navaidDataFactory.UpdateNavaids(retrievedFeatures);
+
+                        navaidDataFactory.DisplayNavaids();
+
                     }
                     catch (OperationCanceledException)
                     {
@@ -101,17 +111,18 @@ namespace Assets.DataManagement.Navaids
                     }
                     catch (Exception ex)
                     {
-                         Debug.LogError($"Error in AsyncRequest: {ex.Message}");
+                        Debug.LogError($"Error in AsyncRequest: {ex.Message}");
                     }
                 }
                 await Task.Delay(TimeSpan.FromSeconds(60), cancellationToken);
             }
         }
 
-        public async Task<string> AsyncRequest(CancellationToken cancellationToken, NavaidTypes navaidType, double[] bbox)
+        public async Task<string> AsyncRequest(CancellationToken cancellationToken, double[] bbox, string _typename)
         {
-            string wfsRequestUrl = "";
-            switch (navaidType)
+            string wfsRequestUrl = WFSRequestBuilder.Request_SeamarkersAll(bbox[0], bbox[1], bbox[2], bbox[3], _typename);
+
+            /* switch (navaidType)
             {
                 case NavaidTypes.BeaconMarker:
                     wfsRequestUrl = WFSRequestBuilder.Request_SeamarkersBeacon(bbox[0], bbox[1], bbox[2], bbox[3]);
@@ -122,8 +133,8 @@ namespace Assets.DataManagement.Navaids
                 case NavaidTypes.Lights:
                     wfsRequestUrl = WFSRequestBuilder.Request_SeamarkersLight(bbox[0], bbox[1], bbox[2], bbox[3]);
                     break;
-            }
-            Debug.LogWarning("request: "+ wfsRequestUrl);
+            } */
+            Debug.LogWarning("request: " + wfsRequestUrl);
 
             HttpRequestMessage httpRequestMessage = new HttpRequestMessage
             {
@@ -138,7 +149,7 @@ namespace Assets.DataManagement.Navaids
                     HttpResponseMessage response = await client.GetAsync(wfsRequestUrl, cancellationToken);
                     response.EnsureSuccessStatusCode();
                     string responseBody = await response.Content.ReadAsStringAsync();
-                    Debug.LogWarning("response: "+ responseBody);
+                      Debug.LogWarning("response: "+ responseBody);
                     return responseBody;
                 }
             }
