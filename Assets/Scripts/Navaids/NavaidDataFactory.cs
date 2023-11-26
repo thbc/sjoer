@@ -16,30 +16,49 @@ namespace Assets.DataManagement.Navaids
         public GameObject seamarkerPrefab;
         public Transform seamarkerContainer;
         public NavaidData.NavaidDict currentNavaids = new NavaidData.NavaidDict();
-     //   private CancellationTokenSource cancellationTokenSource;
+        //   private CancellationTokenSource cancellationTokenSource;
 
-      /*   async void Start()
+        /*   async void Start()
+          {
+              cancellationTokenSource = new CancellationTokenSource();
+              try
+              {
+                  await UpdateNavaidPositions(cancellationTokenSource.Token);
+              }
+              catch (OperationCanceledException)
+              {
+                  Debug.Log("Request was canceled.");
+              }
+              catch (Exception ex)
+              {
+                  Debug.LogError("An error occurred: " + ex.ToString());
+              }
+          }
+   */
+        void Start()
         {
-            cancellationTokenSource = new CancellationTokenSource();
-            try
+            StartCoroutine(CheckPositionsCoroutine());
+        }
+
+        private IEnumerator CheckPositionsCoroutine()
+        {
+            while (true) // Infinite loop to continually check positions
             {
-                await UpdateNavaidPositions(cancellationTokenSource.Token);
-            }
-            catch (OperationCanceledException)
-            {
-                Debug.Log("Request was canceled.");
-            }
-            catch (Exception ex)
-            {
-                Debug.LogError("An error occurred: " + ex.ToString());
+                UpdateNavaidPositions();
+
+                yield return new WaitForSeconds(.1f); // Wait for  a second
             }
         }
- */
 
-          void Update()
-         {
-             UpdateNavaidPositions();
-         } 
+        void OnDisable()
+        {
+            StopCoroutine(CheckPositionsCoroutine());
+
+        }
+        /* void Update()
+       {
+           UpdateNavaidPositions();
+       }  */
 
         public void UpdateNavaids(List<NavaidData.Navaid> newFeatures)
         {
@@ -145,26 +164,26 @@ namespace Assets.DataManagement.Navaids
             return navaidObject;
         }
 
-   /*      private async Task UpdateNavaidPositions(CancellationToken cancellationToken)
-        {
-            while (!cancellationToken.IsCancellationRequested)
-            {
-                foreach (var item in currentNavaids.navaids)
-                {
-                    UpdateNavaidPosition(item.Value);
-                }
-            }
-            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+        /*      private async Task UpdateNavaidPositions(CancellationToken cancellationToken)
+             {
+                 while (!cancellationToken.IsCancellationRequested)
+                 {
+                     foreach (var item in currentNavaids.navaids)
+                     {
+                         UpdateNavaidPosition(item.Value);
+                     }
+                 }
+                 await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
 
+             }
+      */
+        public void UpdateNavaidPositions()
+        {
+            foreach (var item in currentNavaids.navaids)
+            {
+                UpdateNavaidPosition(item.Value);
+            }
         }
- */
-           public void UpdateNavaidPositions()
-          {
-              foreach (var item in currentNavaids.navaids)
-              {
-                  UpdateNavaidPosition(item.Value);
-              }
-          } 
         public void UpdateNavaidPosition(NavaidData.Navaid _navaid)
         {
             if (_navaid.Shape == null)
