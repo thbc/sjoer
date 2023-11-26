@@ -20,8 +20,8 @@ namespace Assets.DataManagement.Navaids
         private HttpClient httpClient = new HttpClient();
         private CancellationTokenSource cancellationTokenSource;
 
-    
-        
+
+
         async void Start()
         {
             cancellationTokenSource = new CancellationTokenSource();
@@ -69,17 +69,17 @@ namespace Assets.DataManagement.Navaids
                         // include other types of cardinal markers that are not Flytandemerke (floating devices)
 
 
-                        string result_Lys = await AsyncRequest(cancellationToken,boundingBox, "Lys");
+                        string result_Lys = await AsyncRequest(cancellationToken, boundingBox, "Lys");
 
                         /* NavaidData.NavaidDataParser parser = new NavaidData.NavaidDataParser();
                         retrievedFeatures = parser.GetNavaidFeaturesFromString(result_seamarkersBeacon); */
                         NavaidData.NavaidDataXMLParser parser = new NavaidData.NavaidDataXMLParser();
                         retrievedFeatures = parser.ParseXml(result_Lys);
-                        Debug.LogWarning(NavaidData.BabordLateralCounter+ "(BabordLateralCounter)||"+NavaidData.StyrbordLateralCounter+ "(StyrbordLateralCounter)||"+NavaidData.LyktefundamentCounter+ "(LyktefundamentCounter)||"+NavaidData.kardinalCounter+ "(kardinalCounter)||");
+                        //    Debug.LogWarning(NavaidData.BabordLateralCounter+ "(BabordLateralCounter)||"+NavaidData.StyrbordLateralCounter+ "(StyrbordLateralCounter)||"+NavaidData.LyktefundamentCounter+ "(LyktefundamentCounter)||"+NavaidData.kardinalCounter+ "(kardinalCounter)||");
 
-                        string result_IB = await AsyncRequest(cancellationToken,boundingBox, "IB");
+                        string result_IB = await AsyncRequest(cancellationToken, boundingBox, "IB");
                         retrievedFeatures.AddRange(parser.ParseXml(result_IB));
-                        Debug.LogWarning(NavaidData.BabordLateralCounter+ "(BabordLateralCounter)||"+NavaidData.StyrbordLateralCounter+ "(StyrbordLateralCounter)||"+NavaidData.LyktefundamentCounter+ "(LyktefundamentCounter)||"+NavaidData.kardinalCounter+ "(kardinalCounter)||");
+                        //    Debug.LogWarning(NavaidData.BabordLateralCounter+ "(BabordLateralCounter)||"+NavaidData.StyrbordLateralCounter+ "(StyrbordLateralCounter)||"+NavaidData.LyktefundamentCounter+ "(LyktefundamentCounter)||"+NavaidData.kardinalCounter+ "(kardinalCounter)||");
 
 
                         // seamarkersCardinal = new NavaidData.FeatureCollection();
@@ -149,7 +149,7 @@ namespace Assets.DataManagement.Navaids
                     HttpResponseMessage response = await client.GetAsync(wfsRequestUrl, cancellationToken);
                     response.EnsureSuccessStatusCode();
                     string responseBody = await response.Content.ReadAsStringAsync();
-                      Debug.LogWarning("response: "+ responseBody);
+                    Debug.LogWarning("response: " + responseBody);
                     return responseBody;
                 }
             }

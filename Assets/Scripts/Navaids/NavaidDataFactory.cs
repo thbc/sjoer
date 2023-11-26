@@ -16,19 +16,30 @@ namespace Assets.DataManagement.Navaids
         public GameObject seamarkerPrefab;
         public Transform seamarkerContainer;
         public NavaidData.NavaidDict currentNavaids = new NavaidData.NavaidDict();
-        private CancellationTokenSource cancellationTokenSource;
+     //   private CancellationTokenSource cancellationTokenSource;
 
-
-        void Start()
+      /*   async void Start()
         {
-            //  Player.Instance.OnPlayerPositionChanged += UpdateNavaidPositions;
             cancellationTokenSource = new CancellationTokenSource();
+            try
+            {
+                await UpdateNavaidPositions(cancellationTokenSource.Token);
+            }
+            catch (OperationCanceledException)
+            {
+                Debug.Log("Request was canceled.");
+            }
+            catch (Exception ex)
+            {
+                Debug.LogError("An error occurred: " + ex.ToString());
+            }
+        }
+ */
 
-        }
-        void Update()
-        {
-            UpdateNavaidPositions();
-        }
+          void Update()
+         {
+             UpdateNavaidPositions();
+         } 
 
         public void UpdateNavaids(List<NavaidData.Navaid> newFeatures)
         {
@@ -115,39 +126,64 @@ namespace Assets.DataManagement.Navaids
             GameObject navaidObject = Instantiate(seamarkerPrefab, seamarkerContainer);
             navaidObject.name = feature.GlobalID;
             feature.navaidInstance = navaidObject.GetComponent<NavaidMonoBehaviour>();
-            feature.navaidInstance.setTypeText(feature.NavaidType.ToString());
+            if (!string.IsNullOrEmpty(feature.Name))
+            {
+                feature.navaidInstance.setTypeText(feature.Name);
+            }
+            else
+            {
+                if (!string.IsNullOrEmpty(feature.Place))
+                {
+                    feature.navaidInstance.setTypeText(feature.Place);
+                }
+                else
+                    feature.navaidInstance.setTypeText("unnamed");
+            }
             //navaidObject.transform.position = new Vector3((float)feature.properties.Long, 0, (float)feature.properties.Lat);
             // Add any required components to the GameObject
             Debug.LogWarning("created GObj for " + feature.GlobalID);
             return navaidObject;
         }
 
-        public void UpdateNavaidPositions()
+   /*      private async Task UpdateNavaidPositions(CancellationToken cancellationToken)
         {
-            foreach (var item in currentNavaids.navaids)
+            while (!cancellationToken.IsCancellationRequested)
             {
-                UpdateNavaidPosition(item.Value);
+                foreach (var item in currentNavaids.navaids)
+                {
+                    UpdateNavaidPosition(item.Value);
+                }
             }
+            await Task.Delay(TimeSpan.FromSeconds(1), cancellationToken);
+
         }
+ */
+           public void UpdateNavaidPositions()
+          {
+              foreach (var item in currentNavaids.navaids)
+              {
+                  UpdateNavaidPosition(item.Value);
+              }
+          } 
         public void UpdateNavaidPosition(NavaidData.Navaid _navaid)
         {
             if (_navaid.Shape == null)
                 return;
             Vector3 position = Player.Instance.GetWorldTransform(_navaid.Latitude, _navaid.Longitude);
-            _navaid.Shape.transform.position = HelperClasses.InfoAreaUtils.Instance.UnityCoordsToHorizonPlane(position, Player.Instance.mainCamera.transform.position, .7f);
+            _navaid.Shape.transform.position = HelperClasses.InfoAreaUtils.Instance.UnityCoordsToHorizonPlane(position, Player.Instance.mainCamera.transform.position);
             _navaid.Shape.transform.rotation = HelperClasses.InfoAreaUtils.Instance.FaceUser(_navaid.Shape.transform.position, Player.Instance.mainCamera.transform.position);
             float dist = position.magnitude;
             _navaid.navaidInstance.setDistanceText(dist);
             // experimental:
-            
+
             _navaid.navaidInstance.DisplayContent(true);
 
             foreach (var item in currentNavaids.navaids)
             {
-                if(/* item.Value.Shape != null &&  */item.Value != _navaid)
+                if (/* item.Value.Shape != null &&  */item.Value != _navaid)
                     CheckAndHandleOverlap(_navaid, item.Value);
             }
-            
+
 
         }
         /* private void UpdateVisibility()
