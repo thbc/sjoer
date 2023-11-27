@@ -2,6 +2,7 @@ using System.Collections;
 using System.Collections.Generic;
 using UnityEngine;
 using TMPro;
+using System;
 namespace Assets.DataManagement.Navaids
 {
     public class NavaidMonoBehaviour : MonoBehaviour
@@ -23,7 +24,10 @@ namespace Assets.DataManagement.Navaids
         }
         public void setDistanceText(float _distance)
         {
-            distanceText.text = ((int)_distance).ToString()+ "m";
+            float rng = _distance / 1852;
+
+
+            distanceText.text = Math.Round(rng, 3).ToString() + "NM";// ((int)_distance).ToString()+ "m";
         }
         public void DisplayContent(bool _state)
         {
