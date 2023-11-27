@@ -104,10 +104,12 @@ namespace Assets.DataManagement.Navaids
 
         public NavaidsGroup currentlyDisplayedNavaidGroup;
 
+        public NavaidDataRetriever navaidDataRetriever;
         public void SetCurrentNavaidGroup(NavaidsGroup _currGroup)
         {
             currentlyDisplayedNavaidGroup = _currGroup;
-            DisplayNavaids();
+           navaidDataRetriever.OnChangeCurrentNavaidGroup(_currGroup);         
+           
         }
 
         public void DisplayNavaids()//(List<NavaidData.Navaid> newFeatures)
