@@ -26,18 +26,18 @@ public class DebugOnHead : MonoBehaviour
     }
 
     [HideInInspector]
-    public string teext_1;
+    public string text_1;
     [HideInInspector]
-    public string teext_2;
+    public string text_2;
 
     public void DebugTextOnHead_1(string _txt)
     {
-      teext_1 =_txt;
+      text_1 =_txt;
     }
 
     public void DebugTextOnHead_2(string _txt)
     {
-        teext_2 = _txt;
+        text_2 = _txt;
     }
 
 }

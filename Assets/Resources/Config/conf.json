@@ -35,7 +35,7 @@
     "HorizonPlaneRadius": 5
   },
   "PhoneGPS": {
-    "IP": "not used",
+    "IP": "127.0.0.1",
     "port":  "6000"
   },
   "Nightmode": false

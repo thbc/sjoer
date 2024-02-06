@@ -111,22 +111,22 @@ namespace Assets.Positional
         {
             Light playerLight = mainCamera.transform.GetChild(0).gameObject.GetComponent<Light>();
             playerLight.range = (float)Config.Instance.conf.UISettings["HorizonPlaneRadius"] + 1;
-            if(nightMode ==0)
+            if (nightMode == 0)
             {
                 playerLight.intensity = value;
-                     Debug.Log("disable nightmode; light intensity: "+ playerLight.intensity);
+                Debug.Log("disable nightmode; light intensity: " + playerLight.intensity);
             }
-            
-            else if(nightMode ==1)
+
+            else if (nightMode == 1)
             {
                 playerLight.intensity = 15;
-                 Debug.Log("enable semi nightmode; light intensity: "+ playerLight.intensity);
+                Debug.Log("enable semi nightmode; light intensity: " + playerLight.intensity);
 
             }
-            else if(nightMode ==2)
+            else if (nightMode == 2)
             {
                 playerLight.intensity = 1;
-                     Debug.Log("enable nightmode; light intensity: "+ playerLight.intensity);
+                Debug.Log("enable nightmode; light intensity: " + playerLight.intensity);
             }
 
         }
@@ -260,7 +260,7 @@ namespace Assets.Positional
             Debug.Log("Unity to true north: " + unityToTrueNorthRotation);
 
         }
-public Transform mixedrealityPlayspace;
+        public Transform mixedrealityPlayspace;
         public PlayerData GetLogData()
         {
             PlayerData data = new PlayerData();
@@ -277,8 +277,8 @@ public Transform mixedrealityPlayspace;
             data.CalibrationDiff = CalibrationDiff;
             data.cameraPos = mainCamera.transform.position;
             data.cameraRot = mainCamera.transform.rotation;
-            if(mixedrealityPlayspace == null)
-               mixedrealityPlayspace = GameObject.Find("MixedRealityPlayspace").transform;
+            if (mixedrealityPlayspace == null)
+                mixedrealityPlayspace = GameObject.Find("MixedRealityPlayspace").transform;
             data.mrPlayspacePos = mixedrealityPlayspace.position;
             data.mrPlayspaceRot = mixedrealityPlayspace.rotation;
 

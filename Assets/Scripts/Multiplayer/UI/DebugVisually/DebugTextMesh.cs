@@ -15,9 +15,9 @@ public class DebugTextMesh : MonoBehaviour
     private void Update()
     {
         if(debugTextIndex == 1)
-            debugText.text = DebugOnHead.Instance.teext_1;
+            debugText.text = DebugOnHead.Instance.text_1;
         else if(debugTextIndex == 2)
-            debugText.text = DebugOnHead.Instance.teext_2;
+            debugText.text = DebugOnHead.Instance.text_2;
     }
 
 }
