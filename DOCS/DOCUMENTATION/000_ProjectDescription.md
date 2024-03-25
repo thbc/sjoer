@@ -12,7 +12,7 @@ The user can either select vessel icons (pins) with their hand or by gaze in ord
 
 In this version, graphics are loaded from the *Resources* folder and instantiated in a complex [factory based system (see more)](../DOCUMENTATION/Scripts&Functions/factory%20based%20system.md).
 
-The other cycle by ==thbc== focused on implementing multiplayer functionality and interacting with settings on a user interface (UI). Although some parts of the original project had to be adapted, this can mainly be seen as another layer on top of the base project. Some approaches are done differently to the first part and the scripts are rather attached to GameObjects within the scene than instantiated from others on the fly.
+The other cycle focused on implementing multiplayer functionality and interacting with settings on a user interface (UI). Although some parts of the original project had to be adapted, this can mainly be seen as another layer on top of the base project. Some approaches are done differently to the first part and the scripts are rather attached to GameObjects within the scene than instantiated from others on the fly.
 
 When two HoloLens HMDs (Head Mounted Displays) are connected to the same WIFI network the devices send out data to each other via OSC, after entering each IP addresses. This will show a cursor from the other players hand pointer. If MarkMode is enabled on both devices, one can mark vessel pins for the player, and there will be different colours for sent markers, received markers as well as sent-and-received markers.
 
