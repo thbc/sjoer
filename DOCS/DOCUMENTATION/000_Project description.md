@@ -26,4 +26,4 @@ A config file allows parameters to be changed during development process for tes
 
 * * *
 
-[Getting started](/001_GettingStarted.md.md)
+[Getting started](DOCS/DOCUMENTATION/001_GettingStarted.md.md)
