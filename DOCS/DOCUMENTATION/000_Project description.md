@@ -26,4 +26,4 @@ A config file allows parameters to be changed during development process for tes
 
 * * *
 
-[Getting started](sjoer/DOCS/DOCUMENTATION/001_Getting Started.md)
+[Getting started](thbc/sjoer/DOCS/DOCUMENTATION/001_Getting Started.md)
