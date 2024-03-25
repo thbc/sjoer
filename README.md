@@ -6,4 +6,4 @@
 
 This repository is currently updated with in depth documentation and code cleanup. The documentation is incomplete and some links might be broken.
 
-[Start here with the project description](DOCS/DOCUMENTATION/000_Project description.md).
+[Start here with the project description](DOCS/DOCUMENTATION/000_ProjectDescription.md).
