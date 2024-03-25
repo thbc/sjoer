@@ -2,7 +2,7 @@ The Unity project implements a Mixed Reality visualization of realtime AIS ship 
 
 It was produced during two main programming cycles.
 
-The first from Imable (https://github.com/Imable/sjoer) created the foundation of the HoloLens implementation, for retrieving API data and displaying data in real-time. It uses the GPS position data streamed from a connected phone via a locally hosted server (on the phone) to update the Unity positions of the vessel object correctly matched to the player position. A substantial part of development has established geographically correct conversions and performance optimized C# class structures.
+The first from [Imable](https://github.com/Imable/sjoer) created the foundation of the HoloLens implementation, for retrieving API data and displaying data in real-time. It uses the GPS position data streamed from a connected phone via a locally hosted server (on the phone) to update the Unity positions of the vessel object correctly matched to the player position. A substantial part of development has established geographically correct conversions and performance optimized C# class structures.
 
 An additional calibration scene calibrates the main scene based on the offset between player orientation and real world north orientation.
 
@@ -26,4 +26,4 @@ A config file allows parameters to be changed during development process for tes
 
 * * *
 
-[Get started]([001_Getting Started](:/5c5002eaf7d048e980c535d046c7bab4))
+[Getting started](sjoer/DOCS/DOCUMENTATION/001_Getting Started.md)
