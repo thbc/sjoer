@@ -2,8 +2,8 @@
   "VesselMode": false,
   "DataSettings": {
     "UpdateInterval": 0.1,
-    "LatitudeArea": 3000,
-    "LongitudeArea": 3000,
+    "LatitudeArea": 3000,  // the bounding box dimensions used for determining..
+    "LongitudeArea": 3000, // ..the reach area to retrieve vessels via API; default value: "3000"
     "UIElementHeight": 0.0,
     "SkyAreaHeightTarget": 2.0,
     "SkyAreaHeightHover": 1.0,
@@ -24,7 +24,7 @@
     "Longitude_home": 5.322880
   },
   "SceneSettings": {
-    "SceneInterval": 10
+    "SceneInterval": 10 //??
   },
   "CalibrationSettings": {
     "SteadyTime": 7,
@@ -35,7 +35,9 @@
     "HorizonPlaneRadius": 5
   },
   "PhoneGPS": {
-    "IP": "192.168.43.1",
+    "IP": "127.0.0.1",
     "port":  "6000"
-  }
+  },
+  "Nightmode": false
+
 }

@@ -7,10 +7,11 @@ EditorBuildSettings:
   m_Scenes:
   - enabled: 1
     path: Assets/Scenes/Default.unity
-    guid: 9e12c67301f274e4189f384b11740149
-  - enabled: 1
+    guid: f4dc96c5c839eb440bb53b391f2a177b
+  - enabled: 0
     path: Assets/Scenes/Calibration.unity
     guid: d4d30d0067607e643939b00faebd1a6f
   m_configObjects:
+    Unity.XR.WindowsMR.Settings: {fileID: 11400000, guid: 38c30238ae9806e4eab5e3f5a9c7a690, type: 2}
     com.unity.xr.management.loader_settings: {fileID: 11400000, guid: 6b8259128faa40c4a877ea084109c17b, type: 2}
     com.unity.xr.openxr.settings4: {fileID: 11400000, guid: 50873c9e6a9c6434cb14e01e6cd8e4e5, type: 2}
