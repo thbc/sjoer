@@ -24,7 +24,7 @@
     "Longitude_home": 5.322880
   },
   "SceneSettings": {
-    "SceneInterval": 10
+    "SceneInterval": 10 //??
   },
   "CalibrationSettings": {
     "SteadyTime": 7,

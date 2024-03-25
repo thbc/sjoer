@@ -142,77 +142,9 @@ namespace Assets.SceneManagement
             }
         }
 
-        /* var L = GetAllItemsFromAISHorizon();
-        if(L == null)
-        {
-
-
-            string _allDgb = "";
-            foreach (var Litem in allInfoItems)
-            {
-                _allDgb = _allDgb + "key: " +Litem.Key + "|gameobject: "+ Litem.Value.;
-            }
-            Debug.LogWarning($"No specific item with key:  found for category: {"AISHorizon"}"+ _key);
-                                Debug.LogWarning("but found in all items: "+ _allDgb);
-
-            return null;
-        }
-        else{
-        var item = L.Find(item => item.Key == _key);
-        if (item != null)
-        {
-            return item;
-        }
-        else
-        {
-            string _allDgb = "";
-            foreach (var Litem in L)
-            {
-                _allDgb = _allDgb + Litem.Key;
-            }
-            Debug.LogWarning($"No specific item with key:  found for category: {"AISHorizon"}"+ _key);
-                                Debug.LogWarning("but found in all items: "+ _allDgb);
-
-            return null;
-        }
-        } */
-
-        /* } */
+       
 
 
     }
-/* 
-    List<InfoItem> GetAllItemsMarkedAsReceived()
-    {
-        List<InfoItem> markedReceivedItems = new List<InfoItem>();
-        var L = GetAllItemsFromAISHorizon();
-
-        foreach (var infoItem in L)
-        {
-            if (infoItem.markedStateFlag.IsMarkedReceived())
-            {
-                markedReceivedItems.Add(infoItem);
-            }
-        }
-
-        
-
-        return markedReceivedItems;
-    } */
-/*     List<InfoItem> GetAllItemsMarkedAsSent()
-    {
-        List<InfoItem> markedSentItems = new List<InfoItem>();
-        var L = GetAllItemsFromAISHorizon();
-
-        foreach (var infoItem in L)
-        {
-            if (infoItem.markedStateFlag.IsMarkedSent())
-            {
-                markedSentItems.Add(infoItem);
-            }
-        }
-        return markedSentItems;
-    }
- */
 
 }
